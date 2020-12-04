@@ -1,2 +1,2 @@
-# corn-os
+# CornOS
 A toy OS written in C
