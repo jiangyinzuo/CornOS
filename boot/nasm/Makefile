@@ -22,6 +22,18 @@ mbr_disk.img:
 	dd if=./bin/loader.bin of=./bin/mbr_disk.img bs=512 count=1 seek=2 conv=notrunc
 	rm bin/loader.bin
 
+mbr_proc.img:
+	if [ ! -d "./bin" ]; then mkdir "bin";	fi
+	dd if=/dev/zero of=./bin/mbr_proc.img count=10000
+	nasm -I include/ ./proc_mode/mbr.S -o ./bin/mbr_disk.bin
+	dd if=./bin/mbr_disk.bin of=./bin/mbr_proc.img bs=512 count=1 conv=notrunc
+	rm bin/mbr_disk.bin
+
+	nasm -I include/ ./proc_mode/loader.S -o ./bin/loader.bin
+	# 第二个扇区
+	dd if=./bin/loader.bin of=./bin/mbr_proc.img bs=512 count=4 seek=2 conv=notrunc
+	rm bin/loader.bin
+
 clean:
 	rm -rf ./bin
 
