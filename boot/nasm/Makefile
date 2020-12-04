@@ -12,7 +12,7 @@ mbr_vedio.img: mbr_video.S
 
 mbr_disk.img:
 	if [ ! -d "./bin" ]; then mkdir "bin";	fi
-
+	dd if=/dev/zero of=./bin/mbr_disk.img count=10000
 	nasm -I include/ mbr_disk.S -o ./bin/mbr_disk.bin
 	dd if=./bin/mbr_disk.bin of=./bin/mbr_disk.img bs=512 count=1 conv=notrunc
 	rm bin/mbr_disk.bin
