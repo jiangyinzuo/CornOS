@@ -34,10 +34,10 @@
 ;打印字符，"2 LOADER"说明loader已经成功加载
 ; 输出背景色绿色，前景色红色，并且跳动的字符串"1 MBR"
 mov byte [gs:160],'2'
-mov byte [gs:161],0xA4     ; A表示绿色背景闪烁，4表示前景色为红色
+mov byte [gs:161],0x14     ; A表示绿色背景闪烁，4表示前景色为红色
 
 mov byte [gs:162],' '
-mov byte [gs:163],0xA4
+mov byte [gs:163],0x14
 
 mov byte [gs:164],'L'
 mov byte [gs:165],0xA4   

@@ -23,13 +23,13 @@ SECTION MBR vstart=0x7c00
 ;(CL,CH) = 窗口左上角的(X,Y)位置
 ;(DL,DH) = 窗口右下角的(X,Y)位置
 ;无返回值：
-   mov     ax, 0600h
-   mov     bx, 0700h
-   mov     cx, 0                   ; 左上角: (0, 0)
-   mov     dx, 184fh		   ; 右下角: (80,25),
+;   mov     ax, 0600h
+;   mov     bx, 0700h
+;   mov     cx, 0                   ; 左上角: (0, 0)
+;   mov     dx, 184fh		   ; 右下角: (80,25),
 				   ; 因为VGA文本模式中，一行只能容纳80个字符,共25行。
 				   ; 下标从0开始，所以0x18=24,0x4f=79
-   int     10h                     ; int 10h
+;   int     10h                     ; int 10h
 
    ; 输出字符串:MBR
    mov byte [gs:0x00],'1'
