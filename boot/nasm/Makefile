@@ -10,6 +10,18 @@ mbr_vedio.img: mbr_video.S
 	dd if=bin/mbr_vedio.bin of=bin/$@ bs=512 count=1 conv=notrunc
 	rm bin/mbr_vedio.bin
 
+mbr_disk.img:
+	if [ ! -d "./bin" ]; then mkdir "bin";	fi
+
+	nasm -I include/ mbr_disk.S -o ./bin/mbr_disk.bin
+	dd if=./bin/mbr_disk.bin of=./bin/mbr_disk.img bs=512 count=1 conv=notrunc
+	rm bin/mbr_disk.bin
+
+	nasm -I include/ loader.S -o ./bin/loader.bin
+	# 第二个扇区
+	dd if=./bin/loader.bin of=./bin/mbr_disk.img bs=512 count=1 seek=2 conv=notrunc
+	rm bin/loader.bin
+
 clean:
 	rm -rf ./bin
 
