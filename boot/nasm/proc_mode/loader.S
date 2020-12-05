@@ -58,8 +58,6 @@ mov byte [gs:174],'R'
 mov byte [gs:175],0xA4
 
 
-
-
 ;------------------------------------------------------------
 ;INT 0x10    功能号:0x13    功能描述:打印字符串
 ;------------------------------------------------------------
@@ -91,9 +89,22 @@ mov byte [gs:175],0xA4
 
 
    ;-----------------  打开A20  ----------------
-   in al,0x92
-   or al,0000_0010B
-   out 0x92,al
+seta20.1:
+    in byte al, 0x64                                  ; Wait for not busy(8042 input buffer empty).
+    test byte al, 0x2
+    jnz seta20.1
+
+    mov byte al, 0xd1                                 ; 0xd1 -> port 0x64
+    out byte 0x64, al                                 ; 0xd1 means: write data to 8042's P2 port
+
+seta20.2:
+    in byte al, 0x64                                  ; Wait for not busy(8042 input buffer empty).
+    test byte al, 0x2
+    jnz seta20.2
+
+    mov byte al, 0xdf                                 ; 0xdf -> port 0x60
+    out byte 0x60, al
+
 
    ;-----------------  加载GDT  ----------------
    lgdt [gdt_ptr]
