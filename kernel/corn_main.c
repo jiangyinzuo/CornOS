@@ -22,6 +22,6 @@ _Noreturn void corn_main()
 	puts(m_Test);
 
 	pic_init();
-	for (;;) {
-	}
+	for (;;)
+		;
 }
