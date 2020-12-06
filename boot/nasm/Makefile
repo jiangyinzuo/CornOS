@@ -1,11 +1,11 @@
 hd60m.img: mbr.S
-	if [!-d bin]; then mkdir "bin"; fi
+	if [ ! -d "./bin" ]; then mkdir "bin"; fi
 	nasm -f bin $< -o bin/mbr.bin
 	dd if=bin/mbr.bin of=bin/$@ bs=512 count=1 conv=notrunc
 	rm bin/mbr.bin
 
 mbr_vedio.img: mbr_video.S
-	if [!-d bin]; then mkdir "bin"; fi
+	if [ ! -d "./bin" ]; then mkdir "bin"; fi
 	nasm -f bin $< -o bin/mbr_vedio.bin
 	dd if=bin/mbr_vedio.bin of=bin/$@ bs=512 count=1 conv=notrunc
 	rm bin/mbr_vedio.bin
