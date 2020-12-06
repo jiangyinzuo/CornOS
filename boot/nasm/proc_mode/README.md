@@ -1,4 +1,5 @@
 ## 打开A20地址线的方法
+[参考博客](https://blog.csdn.net/ruyanhai/article/details/7181842)
 
 1. 调用BIOS中断就可以实现A20 Gate的控制功能。 这个BIOS中断为 INT 15h, AX=2401h。被称为Fast A20。
 ```asm
