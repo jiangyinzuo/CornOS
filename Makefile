@@ -1,16 +1,19 @@
 include tools/functions.mk
 
-GCC_FLAGS := -I. -fno-builtin -fno-PIC -Wall -ggdb -m32 -gstabs -nostdinc -fno-stack-protector
-corn.img: boot_block
+GCC_FLAGS := -I. -fno-builtin -fno-PIC -Wall -ggdb \
+ 			 -m32 -gstabs -nostdinc -fno-stack-protector
+
+corn.img: boot_block picirq.o
 	if [ ! -d "./bin/obj/kernel" ]; then mkdir -p "bin/obj/kernel";	fi
-	gcc $(GCC_FLAGS) \
-  		-fno-stack-protector -c kernel/corn_main.c -o bin/obj/kernel/corn_main.o
-	ld -m elf_i386 -nostdlib -T tools/kernel.ld -o bin/corn_kernel  \
+	gcc $(GCC_FLAGS) -c kernel/corn_main.c -o bin/obj/kernel/corn_main.o
+	ld -m elf_i386 -nostdlib -T tools/kernel.ld -o bin/corn_kernel bin/obj/kernel/picirq.o  \
 		bin/obj/kernel/corn_main.o
 	dd if=/dev/zero of=bin/$@ count=10000
 	dd if=bin/boot_block of=bin/$@ conv=notrunc
 	dd if=bin/corn_kernel of=bin/$@ seek=1 conv=notrunc
 
+picirq.o:
+	gcc $(GCC_FLAGS) -c kernel/picirq.c -o bin/obj/kernel/$@
 #--------------------------- boot loader ------------------------------
 
 boot_block: bootasm.o bootmain.o mbr_sign

@@ -1,5 +1,7 @@
 // Copyright (c) 2020, Jiang Yinzuo. All rights reserved.
 
+#include "picirq.h"
+
 void putchar(unsigned char ch, int i)
 {
 	// 实模式下gs=0xb800
@@ -18,6 +20,8 @@ _Noreturn void corn_main()
 {
 	unsigned char m_Test[20] = "hello CornOS";
 	puts(m_Test);
+
+	pic_init();
 	for (;;) {
 	}
 }

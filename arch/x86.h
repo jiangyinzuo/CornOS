@@ -1,7 +1,7 @@
 #ifndef LIBS_X86_H
 #define LIBS_X86_H
 
-#include "defs.h"
+#include <lib/defs.h>
 
 #define do_div(n, base)                                              \
 	({                                                           \
@@ -56,9 +56,10 @@ static inline void insl(uint32_t port, void *addr, int cnt)
 		     : "memory", "cc");
 }
 
+/* write @data(a byte) to the @port */
 static inline void outb(uint16_t port, uint8_t data)
 {
-	asm volatile("outb %0, %1" ::"a"(data), "d"(port));
+	asm volatile("outb %b0, %w1" ::"a"(data), "Nd"(port));
 }
 
 static inline void outw(uint16_t port, uint16_t data)
