@@ -16,7 +16,7 @@ void puts(unsigned char *s)
 
 _Noreturn void corn_main()
 {
-	unsigned char m_Test[20] = "hello CornOS"; // t
+	unsigned char m_Test[20] = "hello CornOS";
 	puts(m_Test);
 	for (;;) {
 	}
