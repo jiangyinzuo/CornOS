@@ -3,22 +3,29 @@ include tools/functions.mk
 GCC_FLAGS := -I. -fno-builtin -fno-PIC -Wall -ggdb \
  			 -m32 -gstabs -nostdinc -fno-stack-protector
 
-KERNEL_SRC = $(wildcard kernel/*.c)               # list of kernel/*.c
-KERNEL_OBJS = $(patsubst %.c, %.o, $(KERNEL_SRC)) # list of object files
+SRC = kernel arch
+OBJ = bin/obj
+
+KERNEL_SRC := $(shell find $(SRC) -type f -regex '.*\.[S|c]')  # list of kernel/*.c
+KERNEL_OBJS := $(filter %.o,$(KERNEL_SRC:.S=.o) $(KERNEL_SRC:.c=.o))     # list of object files
 
 corn.img: boot_block kernel_objs
-	ld -m elf_i386 -nostdlib -T tools/kernel.ld -o $(patsubst %, bin/obj/%, $(KERNEL_OBJS))
+	ld -m elf_i386 -nostdlib -T tools/kernel.ld -o bin/corn_kernel \
+ 		$(patsubst %, bin/obj/%, $(KERNEL_OBJS))
 	dd if=/dev/zero of=bin/$@ count=10000
 	dd if=bin/boot_block of=bin/$@ conv=notrunc
 	dd if=bin/corn_kernel of=bin/$@ seek=1 conv=notrunc
 
-#--------------- compile all kernel/*.c to .o files -------------------
+#--------------- compile all kernel .o files -------------------
 
-kernel_objs : $(KERNEL_OBJS)                      # target
+kernel_objs: $(KERNEL_OBJS)     # target
 
+%.o: %.S
+	mkdir -p $(shell dirname $(OBJ)/$@)
+	gcc $(GCC_FLAGS) -o $(OBJ)/$@ -c $<
 %.o: %.c
-	if [ ! -d "./bin/obj/kernel" ]; then mkdir -p "bin/obj/kernel";	fi
-	gcc $(GCC_FLAGS) -c $< -o bin/obj/$@
+	mkdir -p $(shell dirname $(OBJ)/$@)
+	gcc $(GCC_FLAGS) -o $(OBJ)/$@ -c $<
 
 #--------------------------- boot loader ------------------------------
 
@@ -28,12 +35,12 @@ boot_block: bootasm.o bootmain.o mbr_sign
 	objcopy -S -O binary bin/obj/bootblock.o bin/obj/bootblock.out
 	bin/tools/mbr_sign bin/obj/bootblock.out bin/$@
 
-bootasm.o: ./boot/bootasm.S
+bootasm.o: boot
 	if [ ! -d "./bin/obj/boot" ]; then mkdir -p "bin/obj/boot";	fi
 	gcc $(GCC_FLAGS) -Os \
 	 	-c boot/bootasm.S -o bin/obj/boot/bootasm.o
 
-bootmain.o: ./boot/bootmain.c
+bootmain.o: boot
 	if [ ! -d "./bin/obj/boot" ]; then mkdir -p "bin/obj/boot";	fi
 	gcc -Iboot/ $(GCC_FLAGS) -Os \
 		-c boot/bootmain.c -o bin/obj/boot/bootmain.o
