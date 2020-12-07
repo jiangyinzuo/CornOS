@@ -26,6 +26,8 @@ start:
     #  For backwards compatibility with the earliest PCs, physical
     #  address line 20 is tied low, so that addresses higher than
     #  1MB wrap around to zero by default. This code undoes this.
+    # Fast A20 Gate
+    # see https://wiki.osdev.org/A20
     movw $0x2401, %ax
     int $0x15
 

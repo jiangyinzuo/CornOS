@@ -21,9 +21,3 @@ void idt_init()
 	set_gate(idt + TRAP_SWITCH_TO_KERNEL, TYPE_INT_GATE32, GD_KERNEL_TEXT,
 		 (uint32_t)__int_vectors[TRAP_SWITCH_TO_KERNEL], DPL_USER);
 }
-
-void trap(struct trapframe *tf)
-{
-	// dispatch based on what type of trap occurred
-	//	trap_dispatch(tf);
-}
