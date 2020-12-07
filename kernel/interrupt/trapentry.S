@@ -1,4 +1,4 @@
-#include "mm/layout.h"
+#include "../mm/layout.h"
 
 # vectors.S sends all traps here.
 .text
@@ -12,8 +12,8 @@ __alltraps:
     pushl %gs
     pushal
 
-    # load GD_KDATA into %ds and %es to set up data segments for kernel
-    movl $GD_KDATA, %eax
+    # load GD_KERNEL_DATA into %ds and %es to set up data segments for kernel
+    movl $GD_KERNEL_DATA, %eax
     movw %ax, %ds
     movw %ax, %es
 

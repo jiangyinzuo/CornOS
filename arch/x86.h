@@ -29,13 +29,19 @@ static inline void outw(uint16_t port, uint16_t data)
 	__attribute__((always_inline));
 static inline uint32_t read_ebp(void) __attribute__((always_inline));
 
-/* Pseudo-descriptors used for LGDT, LLDT(not used) and LIDT instructions. */
-struct pseudodesc {
-	uint16_t pd_lim; // Limit
-	uint32_t pd_base; // Base address
+/**
+ * GDTR, LDTR or IDTR are 48 bits in x86 protected mode.
+ * 32 bits holds the base address, 16 bits holds the offset.
+ *
+ * @see Intel® 64 and IA-32 Architectures Software Developer’s Manual
+ * 	3A 2.4.1~3
+ */
+struct XDTR_t {
+	uint16_t limit;
+	uint32_t base_addr;
 } __attribute__((packed));
 
-static inline void lidt(struct pseudodesc *pd) __attribute__((always_inline));
+static inline void lidt(struct XDTR_t *pd) __attribute__((always_inline));
 static inline void sti(void) __attribute__((always_inline));
 static inline void cli(void) __attribute__((always_inline));
 static inline void ltr(uint16_t sel) __attribute__((always_inline));
@@ -74,7 +80,7 @@ static inline uint32_t read_ebp(void)
 	return ebp;
 }
 
-static inline void lidt(struct pseudodesc *pd)
+static inline void lidt(struct XDTR_t *pd)
 {
 	asm volatile("lidt (%0)" ::"r"(pd));
 }
