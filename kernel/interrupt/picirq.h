@@ -12,4 +12,5 @@ void pic_enable(unsigned int irq);
 #define IRQ0_TIMER 0
 #define IRQ1_KEYBOARD 1
 
+
 #endif //CORNOS_KERNEL_PICIRQ_H
