@@ -47,6 +47,9 @@ struct trap_frame {
 	uint16_t tf_padding5;
 } __attribute__((packed));
 
+void intr_enable(void);
+void intr_disable(void);
+
 void trap(struct trap_frame *tf);
 
 #endif // CORNOS_ARCH_X86_INTERRUPT_H

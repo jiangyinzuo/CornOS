@@ -10,6 +10,6 @@ void pic_enable(unsigned int irq);
 
 // see https://en.wikipedia.org/wiki/Interrupt_request_(PC_architecture)
 #define IRQ0_TIMER 0
-#define IRQ0_KEYBOARD 1
+#define IRQ1_KEYBOARD 1
 
 #endif //CORNOS_KERNEL_PICIRQ_H

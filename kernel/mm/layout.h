@@ -29,9 +29,9 @@
 #define DPL_KERNEL (0)
 #define DPL_USER (3)
 
-#define KERNEL_CS ((GD_KTEXT) | DPL_KERNEL)
-#define KERNEL_DS ((GD_KDATA) | DPL_KERNEL)
-#define USER_CS ((GD_UTEXT) | DPL_USER)
-#define USER_DS ((GD_UDATA) | DPL_USER)
+#define KERNEL_CS ((GD_KERNEL_TEXT) | DPL_KERNEL)
+#define KERNEL_DS ((GD_KERNEL_DATA) | DPL_KERNEL)
+#define USER_CS ((GD_USER_TEXT) | DPL_USER)
+#define USER_DS ((GD_USER_DATA) | DPL_USER)
 
 #endif // ARCH_X86_MM_LAYOUT_H
