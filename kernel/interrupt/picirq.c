@@ -1,5 +1,6 @@
 // Copyright (c) 2020, Jiang Yinzuo. All rights reserved.
 
+// see http://www.ece.northwestern.edu/~ypa448/Microp/Sup0405_8.doc
 #include "picirq.h"
 
 #include <lib/defs.h>
@@ -48,8 +49,8 @@ void pic_init(void)
 	//    i:  0 = no ICW4, 1 = ICW4 required
 	outb(IO_PIC1, 0x11);
 
-	// ICW2:  Vector offset
-	outb(IO_PIC1 + 1, IRQ_OFFSET);
+	// ICW2: Selects Base Vector Address.
+	outb(IO_PIC1 + 1, IRQ_BASE_ADDR);
 
 	// ICW3:  (master PIC) bit mask of IR lines connected to slaves
 	//        (slave PIC) 3-bit # of slave's connection to master
@@ -67,7 +68,8 @@ void pic_init(void)
 
 	// Set up slave (8259A-2)
 	outb(IO_PIC2, 0x11); // ICW1
-	outb(IO_PIC2 + 1, IRQ_OFFSET + 8); // ICW2
+
+	outb(IO_PIC2 + 1, IRQ_BASE_ADDR + 8); // ICW2
 	outb(IO_PIC2 + 1, IRQ_SLAVE); // ICW3
 	// NB Automatic EOI mode doesn't tend to work on the slave.
 	// Linux source code says it's "to be investigated".
