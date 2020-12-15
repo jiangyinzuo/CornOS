@@ -8,6 +8,15 @@
 #include "io/text/cursor.h"
 #include "mm/pmm.h"
 
+void kernel_init()
+{
+	pmm_init();
+	pic_init();
+	idt_init();
+	timer8253_init();
+	intr_enable();
+}
+
 _Noreturn void corn_main()
 {
 	enable_cursor(0, 15);
@@ -15,11 +24,7 @@ _Noreturn void corn_main()
 	puts(m_Test);
 
 	update_cursor(0, 9);
-	pmm_init();
-	pic_init();
-	idt_init();
-	timer8253_init();
-	intr_enable();
+	kernel_init();
 
 	update_cursor(3, 10);
 	unsigned char m_Test1[20] = "waiting";

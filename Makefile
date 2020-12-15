@@ -3,7 +3,7 @@ include tools/functions.mk
 GCC_FLAGS := -I. -fno-builtin -fno-PIC -Wall -ggdb \
  			 -m32 -gstabs -nostdinc -fno-stack-protector
 
-SRC = kernel arch
+SRC = kernel arch include/corn_os
 OBJ = bin/obj
 
 KERNEL_SRC := $(shell find $(SRC) -type f -regex '.*\.[S|c]')  # list of kernel/*.c
@@ -51,5 +51,12 @@ mbr_sign: tools/mbr_sign.c
 
 #----------------------------------------------------------------------
 
+all: corn.img
+
+.PHONY: test
+test:
+	make -C ./test test
+
 clean:
 	rm -rf ./bin
+	make -C ./test clean
