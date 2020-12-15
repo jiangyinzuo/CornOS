@@ -34,4 +34,22 @@
 #define USER_CS ((GD_USER_TEXT) | DPL_USER)
 #define USER_DS ((GD_USER_DATA) | DPL_USER)
 
+#ifndef __ASSEMBLER__
+
+// some constants for bios interrupt 15h AX = 0xE820
+#define E820MAX             20      // number of entries in E820MAP
+#define E820_ARM            1       // address range memory
+#define E820_ARR            2       // address range reserved
+
+struct e820map {
+	int nr_map;
+	struct {
+		uint64_t addr;
+		uint64_t size;
+		uint32_t type;
+	} __attribute__((packed)) map[E820MAX];
+};
+
+#endif // __ASSEMBLER__
+
 #endif // ARCH_X86_MM_LAYOUT_H
