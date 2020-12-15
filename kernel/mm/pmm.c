@@ -4,6 +4,7 @@
 
 #include <lib/defs.h>
 #include <arch/x86.h>
+#include "../io/text/vga_io.h"
 #include "mmu.h"
 #include "layout.h"
 
@@ -92,8 +93,20 @@ static void gdt_init(void)
 	ltr(GD_TSS);
 }
 
-/* pmm_init - initialize the physical memory management */
-void pmm_init(void)
+void page_init()
 {
+	struct e820map *memmap = (struct e820map *)(MEMMAP_ADDR);
+	for (int i = 0; i < memmap->nr_map; ++i) {
+	}
+	put_char('0' + memmap->nr_map % 10, 22);
+}
+
+/* pmm_init - initialize the physical memory management */
+void pmm_init()
+{
+	// detect physical memory space, reserve already used memory,
+	// then use pmm->init_memmap to create free page list
+	page_init();
+
 	gdt_init();
 }

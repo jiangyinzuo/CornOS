@@ -5,6 +5,8 @@
 #define NULL ((void *)0)
 #endif
 
+#if (!defined(_STDIO_H))
+
 #define __always_inline inline __attribute__((always_inline))
 #define __noinline __attribute__((noinline))
 #define __noreturn __attribute__((noreturn))
@@ -29,6 +31,7 @@ typedef uint32_t uintptr_t;
 
 /* size_t is used for memory object sizes */
 typedef uintptr_t size_t;
+#endif
 
 /* used for page numbers */
 typedef size_t ppn_t;
@@ -60,6 +63,6 @@ typedef size_t ppn_t;
  * @member: the name of the member within the struct
  * */
 #define to_struct(ptr, type, member) \
-	((type *)((char *)(ptr)-offsetof(type, member)))
+	((type *)((void *)(ptr)-offsetof(type, member)))
 
 #endif /* LIBS_DEFS_H */
