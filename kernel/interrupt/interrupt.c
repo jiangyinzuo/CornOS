@@ -4,7 +4,7 @@
 #include "interrupt.h"
 #include "picirq.h"
 #include "../device/timer8253.h"
-#include "../io/text/vga_io.h"
+#include "../io/text/vga.h"
 
 #define NUM_TICKS 100
 
@@ -27,7 +27,7 @@ void trap(struct trap_frame *tf)
 	case IRQ_BASE_ADDR + IRQ0_TIMER:
 		++ticks;
 		if(ticks % NUM_TICKS == 0) {
-			put_char('0' + count++ % 10, 12);
+			putchar('0' + count++ % 10);
 		}
 		break;
 	default:
