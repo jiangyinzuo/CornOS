@@ -1,5 +1,5 @@
-#ifndef LIB_ERROR_H
-#define LIB_ERROR_H
+#ifndef CORN_OS_LIB_ERROR_H
+#define CORN_OS_LIB_ERROR_H
 
 /* kernel error codes -- keep in sync with list in lib/printfmt.c */
 #define E_UNSPECIFIED 1 // Unspecified or unknown problem
@@ -12,4 +12,4 @@
 /* the maximum allowed */
 #define MAXERROR 6
 
-#endif /* LIB_ERROR_H */
+#endif /* CORN_OS_LIB_ERROR_H */

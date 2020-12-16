@@ -1,3 +1,5 @@
+// Copyright (c) 2020, Jiang Yinzuo. All rights reserved.
+
 #include <corn_libc/stddef.h>
 #include <corn_os/printfmt.h>
 #include <corn_libc/string.h>

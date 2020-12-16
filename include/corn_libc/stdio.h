@@ -1,5 +1,7 @@
-#ifndef __LIBS_STDIO_H__
-#define __LIBS_STDIO_H__
+// Copyright (c) 2020, Jiang Yinzuo. All rights reserved.
+
+#ifndef CORN_LIBC_STDIO_H
+#define CORN_LIBC_STDIO_H
 
 #include "../../lib/defs.h"
 #include "stdarg.h"
@@ -18,4 +20,4 @@ char *readline(const char *prompt);
 int snprintf(char *str, size_t size, const char *fmt, ...);
 int vsnprintf(char *str, size_t size, const char *fmt, va_list ap);
 
-#endif /* !__LIBS_STDIO_H__ */
+#endif /* CORN_LIBC_STDIO_H */

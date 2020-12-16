@@ -1,5 +1,7 @@
-#ifndef LIBS_DEFS_H
-#define LIBS_DEFS_H
+// Copyright (c) 2020, Jiang Yinzuo. All rights reserved.
+
+#ifndef CORN_OS_LIB_DEFS_H
+#define CORN_OS_LIB_DEFS_H
 
 #include <corn_libc/stdint.h>
 
@@ -35,4 +37,4 @@ typedef size_t ppn_t;
 #define to_struct(ptr, type, member) \
 	((type *)((void *)(ptr)-offsetof(type, member)))
 
-#endif /* LIBS_DEFS_H */
+#endif /* CORN_OS_LIB_DEFS_H */

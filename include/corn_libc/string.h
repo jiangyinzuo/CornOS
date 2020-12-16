@@ -1,5 +1,5 @@
-#ifndef __LIBS_STRING_H__
-#define __LIBS_STRING_H__
+#ifndef CORN_LIBC_STRING_H
+#define CORN_LIBC_STRING_H
 
 #include "../../lib/defs.h"
 
@@ -21,4 +21,4 @@ void *memmove(void *dst, const void *src, size_t n);
 void *memcpy(void *dst, const void *src, size_t n);
 int memcmp(const void *v1, const void *v2, size_t n);
 
-#endif /* !__LIBS_STRING_H__ */
+#endif /* CORN_LIBC_STRING_H */
