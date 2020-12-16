@@ -1,5 +1,7 @@
-#ifndef LIBS_ELF_H
-#define LIBS_ELF_H
+// Copyright (c) 2020, Jiang Yinzuo. All rights reserved.
+
+#ifndef CORN_OS_LIB_ELF_H
+#define CORN_OS_LIB_ELF_H
 
 #include "defs.h"
 
@@ -36,4 +38,4 @@ struct proghdr {
 	uint32_t p_align; // required alignment, invariably hardware page size
 };
 
-#endif /* LIBS_ELF_H */
+#endif /* CORN_OS_LIB_ELF_H */

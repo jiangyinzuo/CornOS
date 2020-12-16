@@ -1,7 +1,7 @@
 // Copyright (c) 2020, Jiang Yinzuo. All rights reserved.
 
-#ifndef CORNOS_LIBC_STDBOOL_H
-#define CORNOS_LIBC_STDBOOL_H
+#ifndef CORN_LIBC_STDBOOL_H
+#define CORN_LIBC_STDBOOL_H
 
 #ifndef __cplusplus
 #define bool _Bool
@@ -9,4 +9,4 @@
 #define false 0
 #endif
 
-#endif // CORNOS_LIBC_STDBOOL_H
+#endif // CORN_LIBC_STDBOOL_H

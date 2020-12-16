@@ -1,7 +1,7 @@
 // Copyright (c) 2020, Jiang Yinzuo. All rights reserved.
 
-#ifndef CORNOS_LIBC_STDINT_H
-#define CORNOS_LIBC_STDINT_H
+#ifndef CORN_LIBC_STDINT_H
+#define CORN_LIBC_STDINT_H
 
 #if (!defined(_STDIO_H))
 
@@ -31,4 +31,4 @@ typedef uint32_t uintptr_t;
 typedef uintptr_t size_t;
 #endif
 
-#endif // CORNOS_LIBC_STDINT_H
+#endif // CORN_LIBC_STDINT_H
