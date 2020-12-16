@@ -7,8 +7,7 @@
 
 #include <lib/defs.h>
 #include <arch/x86.h>
-
-#include "../vga_internel.h"
+#include "vga.h"
 
 static inline void enable_cursor(uint8_t cursor_start, uint8_t cursor_end)
 {
@@ -25,14 +24,18 @@ static inline void disable_cursor()
 	outb(0x3D5, 0x20);
 }
 
-static inline void update_cursor(int x, int y)
+static inline void update_cursor(uint16_t pos)
 {
-	uint16_t pos = y * VGA_WIDTH + x;
-
 	outb(0x3D4, 0x0F);
 	outb(0x3D5, (uint8_t)(pos & 0xFF));
 	outb(0x3D4, 0x0E);
 	outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
+}
+
+static inline void update_cursor_xy(int x, int y)
+{
+	uint16_t pos = y * CRT_COLS + x;
+	update_cursor(pos);
 }
 
 static inline uint16_t get_cursor_position()

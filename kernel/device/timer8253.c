@@ -4,7 +4,7 @@
 
 #include <arch/x86.h>
 #include "../interrupt/picirq.h"
-#include "../io/text/vga_io.h"
+#include "../io/text/vga.h"
 
 #define IO_TIMER1           0x040               // 8253 Timer #1
 #define PIT_CONTROL_PORT   0x043

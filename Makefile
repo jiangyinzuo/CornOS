@@ -1,9 +1,9 @@
 include tools/functions.mk
 
-GCC_FLAGS := -I. -fno-builtin -fno-PIC -Wall -ggdb \
+GCC_FLAGS := -I. -Iinclude -fno-builtin -fno-PIC -Wall -ggdb \
  			 -m32 -gstabs -nostdinc -fno-stack-protector
 
-SRC = kernel arch include/corn_os
+SRC = kernel arch lib
 OBJ = bin/obj
 
 KERNEL_SRC := $(shell find $(SRC) -type f -regex '.*\.[S|c]')  # list of kernel/*.c

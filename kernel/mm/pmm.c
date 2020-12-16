@@ -4,7 +4,7 @@
 
 #include <lib/defs.h>
 #include <arch/x86.h>
-#include "../io/text/vga_io.h"
+#include "../io/text/vga.h"
 #include "mmu.h"
 #include "layout.h"
 
@@ -98,7 +98,7 @@ void page_init()
 	struct e820map *memmap = (struct e820map *)(MEMMAP_ADDR);
 	for (int i = 0; i < memmap->nr_map; ++i) {
 	}
-	put_char('0' + memmap->nr_map % 10, 22);
+	putchar('0' + memmap->nr_map % 10);
 }
 
 /* pmm_init - initialize the physical memory management */

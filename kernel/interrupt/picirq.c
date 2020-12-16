@@ -4,7 +4,7 @@
 #include "picirq.h"
 
 #include <lib/defs.h>
-#include <lib/stdbool.h>
+#include <corn_libc/stdbool.h>
 #include <arch/x86.h>
 
 // I/O Addresses of the two programmable interrupt controllers
