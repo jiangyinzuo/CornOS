@@ -30,7 +30,7 @@
  * */
 static struct taskstate ts = { 0 };
 
-// virtual address of physicall page array
+// virtual address of physical page array
 struct Page *pages;
 // amount of physical memory (in pages)
 uint64_t num_pages = 0;
@@ -118,7 +118,14 @@ void page_init()
 	max_page = MIN(max_page, KMEMSIZE);
 	num_pages = max_page / (uint64_t)PGSIZE;
 
+	// defined in tools/kernel.ld
+	extern char kernel_end[];
+	pages = (struct Page *)ROUNDUP((void *)kernel_end, PGSIZE);
 	printf("max_page: %llu; num_pages: %llu\n", max_page, num_pages);
+
+	for (int i = 0; i < num_pages; ++i) {
+		set_page_reserved(pages + i);
+	}
 }
 
 /* pmm_init - initialize the physical memory management */

@@ -26,6 +26,6 @@ _Noreturn void corn_main()
 	char m_Test1[20] = "waiting";
 	puts(m_Test1);
 	printf("hello %d\n", 123);
-	for (;;)
-		;
+	for (;;) {
+	}
 }
