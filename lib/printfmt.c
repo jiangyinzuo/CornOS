@@ -116,12 +116,12 @@ void printfmt(void (*putch)(int, void *), void *putdat, const char *fmt, ...)
 void vprintfmt(void (*putch)(int, void *), void *putdat, const char *fmt,
 	       va_list ap)
 {
-	register const char *p;
-	register int ch, err;
+	const char *p;
+	int ch, err;
 	unsigned long long num;
 	int base, width, precision, lflag, altflag;
 
-	while (1) {
+	for (;;) {
 		while ((ch = *(unsigned char *)fmt++) != '%') {
 			if (ch == '\0') {
 				return;

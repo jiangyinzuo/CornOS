@@ -1,6 +1,6 @@
 // Copyright (c) 2020, Jiang Yinzuo. All rights reserved.
 
-#include "corn_test.h"
+#include "../corn_test.h"
 
 #include "corn_os/list.h"
 
@@ -39,15 +39,16 @@ TEST(list_entry)
 {
 	LIST_HEAD(head);
 	struct foo_t foo = { 1, 'a', &head };
-	struct foo_t *foo_ptr = list_entry(&foo.list_head, struct foo_t, list_head);
+	struct foo_t *foo_ptr =
+		list_entry(&foo.list_head, struct foo_t, list_head);
 	ASSERT_EQ(&foo, foo_ptr);
 	ASSERT_EQ(1, foo_ptr->a);
-	printf("%lu\n", &foo);
-	printf("%lu\n", &head);
-	printf("%lu\n", &foo.list_head);
-	printf("%lu\n", foo_ptr);
-	printf("%d\n", foo_ptr->a);
-	printf("%d\n", offsetof(struct foo_t, list_head));
+	//	printf("%lu\n", &foo);
+	//	printf("%lu\n", &head);
+	//	printf("%lu\n", &foo.list_head);
+	//	printf("%lu\n", foo_ptr);
+	//	printf("%d\n", foo_ptr->a);
+	//	printf("%d\n", offsetof(struct foo_t, list_head));
 }
 
 TEST_MAIN()
