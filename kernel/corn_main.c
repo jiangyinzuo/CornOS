@@ -23,7 +23,6 @@ _Noreturn void corn_main()
 	kernel_init();
 	char m_Test[20] = "hello CornOS";
 	puts(m_Test);
-
 	char m_Test1[20] = "waiting";
 	puts(m_Test1);
 	printf("hello %d\n", 123);
