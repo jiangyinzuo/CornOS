@@ -6,7 +6,6 @@
 #include "interrupt/interrupt.h"
 #include "device/timer8253.h"
 #include "io/text/vga.h"
-#include "io/text/cursor.h"
 #include "mm/pmm.h"
 
 void kernel_init()

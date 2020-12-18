@@ -2,7 +2,8 @@
 
 #include "pmm.h"
 
-#include <lib/defs.h>
+#include <corn_libc/stdio.h>
+#include <corn_os/algorithm.h>
 #include <arch/x86.h>
 #include "../io/text/vga.h"
 #include "mmu.h"
@@ -29,6 +30,11 @@
  * into SS and ESP respectively.
  * */
 static struct taskstate ts = { 0 };
+
+// virtual address of physicall page array
+struct Page *pages;
+// amount of physical memory (in pages)
+uint64_t num_pages = 0;
 
 /* *
  * Global Descriptor Table:
@@ -96,9 +102,25 @@ static void gdt_init(void)
 void page_init()
 {
 	struct e820map *memmap = (struct e820map *)(MEMMAP_ADDR + KERNBASE);
+
+	puts("e820map:");
+	uint64_t max_page = 0;
 	for (int i = 0; i < memmap->nr_map; ++i) {
+		uint64_t begin = memmap->map[i].addr,
+			 end = begin + memmap->map[i].size;
+		printf("memory area %x: %lu, [%lu, %lu], type = %u.\n", i,
+		       memmap->map[i].size, begin, end - 1,
+		       memmap->map[i].type);
+		if (memmap->map[i].type == E820_ARM && max_page < end &&
+		    begin < KMEMSIZE) {
+			max_page = end;
+		}
 	}
-	putchar('0' + memmap->nr_map % 10);
+	max_page = MIN(max_page, KMEMSIZE);
+	num_pages = max_page / PGSIZE;
+
+	printf("max_page: %lu; num_pages: %lu\n", max_page, num_pages);
+	printf("%lu\n", num_pages);
 }
 
 /* pmm_init - initialize the physical memory management */

@@ -5,10 +5,10 @@
 
 /* HIGH level console I/O */
 
-/* *
+/**
  * putch - writes a single character @c to stdout, and it will
  * increace the value of counter pointed by @cnt.
- * */
+ */
 static void putch(int c, int *cnt)
 {
 	putchar(c);
@@ -18,7 +18,7 @@ static void putch(int c, int *cnt)
 extern void vprintfmt(void (*putch)(int, void *), void *putdat, const char *fmt,
 		      va_list ap);
 
-/* *
+/**
  * vprintf - format a string and writes it to stdout
  *
  * The return value is the number of characters which would be
@@ -26,7 +26,7 @@ extern void vprintfmt(void (*putch)(int, void *), void *putdat, const char *fmt,
  *
  * Call this function if you are already dealing with a va_list.
  * Or you probably want cprintf() instead.
- * */
+ */
 int vprintf(const char *fmt, va_list ap)
 {
 	int cnt = 0;
@@ -34,18 +34,18 @@ int vprintf(const char *fmt, va_list ap)
 	return cnt;
 }
 
-/* *
+/**
  * printf - formats a string and writes it to stdout
  *
  * The return value is the number of characters which would be
  * written to stdout.
- * */
+ * FIXME: can not print 2 or more numbers
+ */
 int printf(const char *fmt, ...)
 {
 	va_list ap;
-	int cnt;
 	va_start(ap, fmt);
-	cnt = vprintf(fmt, ap);
+	int cnt = vprintf(fmt, ap);
 	va_end(ap);
 	return cnt;
 }
