@@ -39,7 +39,6 @@ int vprintf(const char *fmt, va_list ap)
  *
  * The return value is the number of characters which would be
  * written to stdout.
- * FIXME: can not print 2 or more numbers
  */
 int printf(const char *fmt, ...)
 {

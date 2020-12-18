@@ -5,7 +5,6 @@
 #include <corn_libc/stdio.h>
 #include <corn_os/algorithm.h>
 #include <arch/x86.h>
-#include "../io/text/vga.h"
 #include "mmu.h"
 #include "layout.h"
 
@@ -60,10 +59,10 @@ static struct segdesc gdt[] = {
 
 static struct XDTR_t gdt_pd = { sizeof(gdt) - 1, (uint32_t)gdt };
 
-/* *
+/**
  * lgdt - load the global descriptor table register and reset the
  * data/code segement registers for kernel.
- * */
+ */
 static inline void lgdt(struct XDTR_t *pd)
 {
 	asm volatile("lgdt (%0)" ::"r"(pd));
@@ -108,7 +107,7 @@ void page_init()
 	for (int i = 0; i < memmap->nr_map; ++i) {
 		uint64_t begin = memmap->map[i].addr,
 			 end = begin + memmap->map[i].size;
-		printf("memory area %x: %lu, [%lu, %lu], type = %u.\n", i,
+		printf("memory area %x: %llu, [%llu, %llu], type = %lu.\n", i,
 		       memmap->map[i].size, begin, end - 1,
 		       memmap->map[i].type);
 		if (memmap->map[i].type == E820_ARM && max_page < end &&
@@ -117,10 +116,9 @@ void page_init()
 		}
 	}
 	max_page = MIN(max_page, KMEMSIZE);
-	num_pages = max_page / PGSIZE;
+	num_pages = max_page / (uint64_t)PGSIZE;
 
-	printf("max_page: %lu; num_pages: %lu\n", max_page, num_pages);
-	printf("%lu\n", num_pages);
+	printf("max_page: %llu; num_pages: %llu\n", max_page, num_pages);
 }
 
 /* pmm_init - initialize the physical memory management */
