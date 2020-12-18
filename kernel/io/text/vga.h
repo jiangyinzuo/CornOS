@@ -9,7 +9,6 @@
 #define CRT_COLS 80
 
 void putchar(int ch);
-int puts(char *s);
 
 void vga_init();
 

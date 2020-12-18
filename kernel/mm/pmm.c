@@ -95,7 +95,7 @@ static void gdt_init(void)
 
 void page_init()
 {
-	struct e820map *memmap = (struct e820map *)(MEMMAP_ADDR);
+	struct e820map *memmap = (struct e820map *)(MEMMAP_ADDR + KERNBASE);
 	for (int i = 0; i < memmap->nr_map; ++i) {
 	}
 	putchar('0' + memmap->nr_map % 10);

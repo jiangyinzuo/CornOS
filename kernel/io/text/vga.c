@@ -3,9 +3,13 @@
 #include "vga.h"
 #include "cursor.h"
 #include <lib/defs.h>
+#include <kernel/mm/layout.h>
 
-/* In x86 real mode, gs = 0xb800 */
-static uint16_t *const VGA_BUFFER = (uint16_t *const)0xb8000;
+/*
+ * In x86 real mode, gs = 0xb800
+ * When enabling paging, it should add KERNBASE
+ */
+static uint16_t *const VGA_BUFFER = (uint16_t *const)(0xb8000 + KERNBASE);
 static uint16_t vga_pos;
 
 void vga_init()
@@ -42,15 +46,3 @@ void putchar(int ch)
 	update_cursor(vga_pos);
 }
 
-/**
- * puts - writes the string pointed by @s to stdout and
- * appends a newline character.
- */
-int puts(char *s)
-{
-	int i;
-	for (i = 0; s[i]; ++i)
-		putchar(s[i]);
-	putchar('\n');
-	return i + 1;
-}

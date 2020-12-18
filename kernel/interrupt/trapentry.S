@@ -4,7 +4,7 @@
 .text
 .globl __alltraps
 __alltraps:
-    # push registers to build a trap frame
+    # push registers to build a trap frame, save context
     # therefore make the stack look like a struct trapframe
     pushl %ds
     pushl %es
@@ -40,5 +40,5 @@ __trapret:
 
     # get rid of the trap number and error code
     addl $0x8, %esp
+    # interrupt return
     iret
-

@@ -1,5 +1,6 @@
 // Copyright (c) 2020, Jiang Yinzuo. All rights reserved.
 
+#include <corn_libc/stdio.h>
 #include "interrupt/picirq.h"
 #include "interrupt/idt.h"
 #include "interrupt/interrupt.h"
@@ -20,17 +21,13 @@ void kernel_init()
 
 _Noreturn void corn_main()
 {
-	enable_cursor(0, 15);
+	kernel_init();
 	char m_Test[20] = "hello CornOS";
 	puts(m_Test);
 
-	update_cursor_xy(0, 9);
-	kernel_init();
-
-	update_cursor_xy(3, 10);
 	char m_Test1[20] = "waiting";
 	puts(m_Test1);
-
+	printf("hello %d\n", 123);
 	for (;;)
 		;
 }
