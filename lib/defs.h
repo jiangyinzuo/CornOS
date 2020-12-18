@@ -25,9 +25,6 @@ typedef size_t ppn_t;
 		(typeof(a))(ROUNDDOWN((size_t)(a) + __n - 1, __n)); \
 	} while (0);
 
-/* Return the offset of 'member' relative to the beginning of a struct type */
-#define offsetof(type, member) ((size_t)(&((type *)0)->member))
-
 /* *
  * to_struct - get the struct from a ptr
  * @ptr:    a struct pointer of member

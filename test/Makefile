@@ -14,3 +14,6 @@ test: $(TEST_OBJS)
 
 clean:
 	rm -rf ./bin
+
+
+all: test

@@ -9,6 +9,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stddef.h>
+
+#define FMT(val)                                   \
+	_Generic((val), signed char                \
+		 : "%d", unsigned char             \
+		 : "%u", short                     \
+		 : "%d", unsigned short            \
+		 : "%u", int                       \
+		 : "%d", long                      \
+		 : "%ld", long long                \
+		 : "%lld", unsigned                \
+		 : "%u", unsigned long             \
+		 : "%lu", unsigned long long       \
+		 : "%llu", float                   \
+		 : "%f", double                    \
+		 : "%f", long double               \
+		 : "%Lf", default                  \
+		 : _Generic((val - val), ptrdiff_t \
+			    : "%p", default        \
+			    : "undef"))
 
 typedef void(test_case_func_t)(void);
 
@@ -71,16 +91,28 @@ static void test_case_list_free()
 	}                                                             \
 	static void test_##name()
 
-#define ASSERT(x)                                                         \
-	if (!(x)) {                                                       \
-		printf("%sFailure in %s, %d:\n%s", colors[RED], __FILE__, \
-		       __LINE__, colors[RESET]);                          \
-		printf("Expected: true\n");                               \
-		printf("Actual: `%s` is false\n", #x);                    \
-		++num_test_failed;                                        \
+#define PRINT_FAILURE                                                       \
+	printf("%sFailure in %s, %d:\n%s", colors[RED], __FILE__, __LINE__, \
+	       colors[RESET]);
+
+#define ASSERT(x)                                      \
+	if (!(x)) {                                    \
+		PRINT_FAILURE;                         \
+		printf("Expected: true\n");            \
+		printf("Actual: `%s` is false\n", #x); \
+		++num_test_failed;                     \
 	}
 
-#define ASSERT_EQ(x, y) ASSERT((x) == (y))
+#define ASSERT_EQ(x, y)               \
+	if (x != y) {                 \
+		PRINT_FAILURE;        \
+		printf("Expected: "); \
+		printf(FMT(x), x);    \
+		printf("\nActual: "); \
+		printf(FMT(y), y);    \
+		putchar('\n');        \
+		++num_test_failed;    \
+	}
 
 static int corn_test_main(int argc, char *argv[])
 {
@@ -97,10 +129,10 @@ static int corn_test_main(int argc, char *argv[])
 		idx = idx->next;
 	}
 	if (num_test_failed > 0) {
-		printf("%s%d test failed!%s\n", colors[RED], num_test_failed,
+		printf("%s%d tests failed!%s\n", colors[RED], num_test_failed,
 		       colors[RESET]);
 	} else {
-		printf("%sAll test PASSED!%s\n", colors[GREEN], colors[RESET]);
+		printf("%sAll tests PASSED!%s\n", colors[GREEN], colors[RESET]);
 	}
 	test_case_list_free();
 	return num_test_failed != 0;

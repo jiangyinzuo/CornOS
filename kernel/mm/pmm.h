@@ -5,7 +5,7 @@
 
 #include "layout.h"
 
-#define MEMMAP_ADDR 0x8000 // add KERN_BASE when enabling paging
+#define MEMMAP_ADDR 0x8000 // add KERNBASE when enabling paging
 
 #ifndef __ASSEMBLER__
 
@@ -18,8 +18,9 @@
 struct Page {
 	int ref_cnt; // page frame's reference counter
 	uint32_t flags; // array of flags that describe the status of the page frame
-	unsigned int
-		property; // the num of free block, used in first fit pm manager
+
+	// the num of free block, used in first fit pm manager
+	unsigned int property;
 	struct list_head page_link; // free list link
 };
 
