@@ -7,10 +7,10 @@
 #include "stdarg.h"
 
 /* kern/libs/stdio.c */
-int cprintf(const char *fmt, ...);
-int vcprintf(const char *fmt, va_list ap);
-void cputchar(int c);
-int cputs(const char *str);
+int printf(const char *fmt, ...);
+int vprintf(const char *fmt, va_list ap);
+void putchar(int c);
+int puts(const char *str);
 int getchar(void);
 
 /* kern/libs/readline.c */
