@@ -1,6 +1,6 @@
 // Copyright (c) 2020, Jiang Yinzuo. All rights reserved.
 
-#include "../corn_test.h"
+#include "corn_test.h"
 
 #include "corn_os/algorithm.h"
 
