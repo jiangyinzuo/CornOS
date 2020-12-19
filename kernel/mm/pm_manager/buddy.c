@@ -1,12 +1,12 @@
 // Copyright (c) 2020, Jiang Yinzuo. All rights reserved.
 
-#include "pmm_manager.h"
+#include "pm_manager.h"
 
 static void init()
 {
 }
 
-static void init_memmap(struct Page *base, size_t n)
+static void init_memmap(struct Page *base, size_t num_pages)
 {
 }
 

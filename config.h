@@ -4,6 +4,6 @@
 #define CORNOS__CONFIG_H
 
 // first_fit | buddy | slub
-#define PMM_MANAGER slub
+#define PM_MANAGER first_fit
 
 #endif // CORNOS__CONFIG_H

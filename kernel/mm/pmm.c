@@ -2,14 +2,11 @@
 
 #include "pmm.h"
 
-#include <corn_libc/stdio.h>
-#include <corn_os/algorithm.h>
 #include <arch/x86.h>
-#include "./pmm_manager/pmm_manager.h"
+#include "./pm_manager/pm_manager.h"
 #include "mmu.h"
 #include "layout.h"
-
-#include "config.h"
+#include "page.h"
 
 /*
  * Task State Segment:
@@ -36,9 +33,7 @@ static struct taskstate ts = { 0 };
 // virtual address of physical page array
 struct Page *pages;
 // amount of physical memory (in pages)
-uint64_t num_pages = 0;
-
-struct PmmManager *pmm_manager;
+size_t num_pages = 0;
 
 /*
  * Global Descriptor Table:
@@ -103,53 +98,10 @@ static void gdt_init(void)
 	ltr(GD_TSS);
 }
 
-void pmm_manager_init()
-{
-#ifndef PMM_MANAGER
-#define PMM_MANAGER first_fit
-#endif
-	pmm_manager = &PMM_MANAGER;
-	printf("use pmm manager: %s\n", pmm_manager->name);
-	pmm_manager->init();
-}
-
-void page_init()
-{
-	struct e820map *memmap = (struct e820map *)virtual_addr(MEMMAP_ADDR);
-
-	puts("e820map:");
-	uint64_t max_page = 0;
-	for (int i = 0; i < memmap->nr_map; ++i) {
-		uint64_t begin = memmap->map[i].addr,
-			 end = begin + memmap->map[i].size;
-		printf("memory area %x: %llu, [%llu, %llu], type = %lu.\n", i,
-		       memmap->map[i].size, begin, end - 1,
-		       memmap->map[i].type);
-		if (memmap->map[i].type == E820_ARM && max_page < end &&
-		    begin < KMEMSIZE) {
-			max_page = end;
-		}
-	}
-	max_page = MIN(max_page, KMEMSIZE);
-	num_pages = max_page / (uint64_t)PGSIZE;
-
-	// defined in tools/kernel.ld
-	extern char kernel_end[];
-	pages = (struct Page *)ROUNDUP((void *)kernel_end, PGSIZE);
-	printf("max_page: %llu; num_pages: %llu\n", max_page, num_pages);
-
-	for (int i = 0; i < num_pages; ++i) {
-		set_page_reserved(pages + i);
-	}
-
-	uintptr_t free_mem = physical_addr((uintptr_t)pages +
-					   sizeof(struct Page) * num_pages);
-}
-
 /* pmm_init - initialize the physical memory management */
 void pmm_init()
 {
-	pmm_manager_init();
+	pm_manager_init();
 	// detect physical memory space, reserve already used memory,
 	// then use pmm->init_memmap to create free page list
 	page_init();

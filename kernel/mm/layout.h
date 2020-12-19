@@ -34,7 +34,7 @@
 #define USER_CS ((GD_USER_TEXT) | DPL_USER)
 #define USER_DS ((GD_USER_DATA) | DPL_USER)
 
-/* *
+/*
  * Virtual memory map:                                          Permissions
  *                                                              kernel/user
  *
@@ -59,7 +59,8 @@
  *     "Empty Memory" is normally unmapped, but user programs may map pages
  *     there if desired.
  *
- * */
+ * 0G ~ 3G is user space; 3G ~ 4G is kernel space
+ */
 
 /* All physical memory mapped at this address */
 #define KERNBASE 0xC0000000
@@ -83,11 +84,13 @@
 
 // some constants for bios interrupt 15h AX = 0xE820
 #define E820MAX 20 // number of entries in E820MAP
-#define E820_ARM 1 // address range memory
-#define E820_ARR 2 // address range reserved
+#define E820_ADDR_RANGE_MEM 1 // address range memory, os can use this memory
+#define E820_ADDR_RANGE_RESERVED 2 // address range reserved, os can not use
 
 struct e820map {
 	int nr_map;
+
+	// address range descriptor structure
 	struct {
 		uint64_t addr;
 		uint64_t size;
@@ -96,13 +99,13 @@ struct e820map {
 };
 
 static inline uintptr_t __attribute__((always_inline))
-physical_addr(uintptr_t virtual_addr)
+kern_physical_addr(uintptr_t virtual_addr)
 {
 	return virtual_addr - KERNBASE;
 }
 
 static inline uintptr_t __attribute__((always_inline))
-virtual_addr(uintptr_t physical_addr)
+kern_virtual_addr(uintptr_t physical_addr)
 {
 	return physical_addr + KERNBASE;
 }

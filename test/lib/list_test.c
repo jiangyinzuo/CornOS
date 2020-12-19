@@ -11,7 +11,7 @@ TEST(list_add)
 	ASSERT_EQ(head.prev, head.next);
 
 	struct list_head elem1;
-	INIT_LIST_HEAD(&elem1);
+	list_init_head(&elem1);
 	LIST_HEAD(elem2);
 
 	list_add(&head, &elem1);
