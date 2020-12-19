@@ -1,6 +1,7 @@
 // Copyright (c) 2020, Jiang Yinzuo. All rights reserved.
 
 #include "pm_manager.h"
+#include <corn_libc/assert.h>
 
 free_area_t free_area;
 
@@ -17,6 +18,9 @@ static void init()
  */
 static void init_memmap(struct Page *base, size_t n)
 {
+	for (struct Page *p = base; p < base + n; ++p) {
+		assert(test_page_reserved(p));
+	}
 }
 
 static struct Page *alloc_pages(size_t n)

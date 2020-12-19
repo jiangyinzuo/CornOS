@@ -10,4 +10,5 @@ atomic_set_bit(long nr, volatile void *addr)
 		     : "=m"(*(volatile long *)addr)
 		     : "Ir"(nr));
 }
+
 #endif // CORN_OS_ATOMIC_H

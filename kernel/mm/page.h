@@ -73,6 +73,8 @@
 
 #include <corn_libc/stdint.h>
 #include <corn_os/list.h>
+#include <corn_os/bitops.h>
+#include <corn_os/atomic.h>
 #include "layout.h"
 
 typedef uintptr_t pte_t; // page table entry
@@ -147,14 +149,20 @@ static inline int page_ref_dec(struct Page *page)
 	return page->ref_cnt;
 }
 
-#define set_page_reserved(page) atomic_set_bit(PG_reserved, &((page)->flags))
+static inline void set_page_reserved(struct Page *page)
+{
+	atomic_set_bit(PG_reserved, &(page->flags));
+}
 #define clear_page_reserved(page) \
 	atomic_clear_bit(PG_reserved, &((page)->flags))
-#define test_page_reserved(page) atomic_test_bit(PG_reserved, &((page)->flags))
+static inline _Bool test_page_reserved(struct Page *page)
+{
+	return test_bit(PG_reserved, &(page->flags));
+}
 #define set_page_property(page) atomic_set_bit(PG_property, &((page)->flags))
 #define clear_page_property(page) \
 	atomic_clear_bit(PG_property, &((page)->flags))
-#define test_page_property(page)  atomic_test_bit(PG_property, &((page)->flags)
+#define test_page_property(page)  test_bit(PG_property, &((page)->flags)
 
 void page_init();
 

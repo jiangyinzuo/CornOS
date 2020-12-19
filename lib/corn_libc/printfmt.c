@@ -4,9 +4,9 @@
 #include <corn_os/printfmt.h>
 #include <corn_libc/string.h>
 #include <corn_libc/stdio.h>
-#include "defs.h"
+#include "lib/defs.h"
 #include <arch/x86.h>
-#include "error.h"
+#include "lib/error.h"
 
 /*
  * Space or zero padding and a field width are supported for the numeric

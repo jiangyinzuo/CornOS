@@ -1,13 +1,18 @@
 include tools/functions.mk
 
 GCC_FLAGS := -I. -Iinclude -fno-builtin -fno-PIC -Wall -ggdb \
- 			 -m32 -gstabs -nostdinc -fno-stack-protector
+                 -m32 -gstabs -nostdinc -fno-stack-protector
 
 SRC = kernel arch lib
 OBJ = bin/obj
 
 KERNEL_SRC := $(shell find $(SRC) -type f -regex '.*\.[S|c]')  # list of kernel/*.c
 KERNEL_OBJS := $(filter %.o,$(KERNEL_SRC:.S=.o) $(KERNEL_SRC:.c=.o))     # list of object files
+
+all: GCC_FLAGS += -D NDEBUG
+all: corn.img
+
+debug: corn.img
 
 corn.img: boot_block kernel_objs
 	@ld -m elf_i386 -nostdlib -T tools/kernel.ld -o bin/corn_kernel \
@@ -50,8 +55,6 @@ mbr_sign: tools/mbr_sign.c
 	@gcc -O2 $< -o ./bin/tools/$@
 
 #----------------------------------------------------------------------
-
-all: corn.img
 
 .PHONY: test
 test:
