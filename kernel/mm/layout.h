@@ -95,6 +95,18 @@ struct e820map {
 	} __attribute__((packed)) map[E820MAX];
 };
 
+static inline uintptr_t __attribute__((always_inline))
+physical_addr(uintptr_t virtual_addr)
+{
+	return virtual_addr - KERNBASE;
+}
+
+static inline uintptr_t __attribute__((always_inline))
+virtual_addr(uintptr_t physical_addr)
+{
+	return physical_addr + KERNBASE;
+}
+
 #endif // __ASSEMBLER__
 
 #endif // ARCH_X86_MM_LAYOUT_H

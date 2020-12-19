@@ -6,7 +6,7 @@
 static inline void __attribute__((always_inline))
 atomic_set_bit(long nr, volatile void *addr)
 {
-	asm volatile("lock; btsl %1, %0"
+	asm volatile("lock btsl %1, %0"
 		     : "=m"(*(volatile long *)addr)
 		     : "Ir"(nr));
 }

@@ -5,10 +5,13 @@
 #include <corn_libc/stdio.h>
 #include <corn_os/algorithm.h>
 #include <arch/x86.h>
+#include "./pmm_manager/pmm_manager.h"
 #include "mmu.h"
 #include "layout.h"
 
-/* *
+#include "config.h"
+
+/*
  * Task State Segment:
  *
  * The TSS may reside anywhere in memory. A special segment register called
@@ -27,7 +30,7 @@
  * contains the new ESP value for CPL = 0. When an interrupt happens in protected
  * mode, the x86 CPU will look in the TSS for SS0 and ESP0 and load their value
  * into SS and ESP respectively.
- * */
+ */
 static struct taskstate ts = { 0 };
 
 // virtual address of physical page array
@@ -35,7 +38,9 @@ struct Page *pages;
 // amount of physical memory (in pages)
 uint64_t num_pages = 0;
 
-/* *
+struct PmmManager *pmm_manager;
+
+/*
  * Global Descriptor Table:
  *
  * The kernel and user segments are identical (except for the DPL). To load
@@ -47,7 +52,7 @@ uint64_t num_pages = 0;
  *   - 0x18:  user code segment
  *   - 0x20:  user data segment
  *   - 0x28:  defined for tss, initialized in gdt_init
- * */
+ */
 static struct segdesc gdt[] = {
 	SEG_NULL,
 	[SEG_KERNEL_TEXT] = SEG(STA_X | STA_R, 0x0, 0xFFFFFFFF, DPL_KERNEL),
@@ -98,9 +103,19 @@ static void gdt_init(void)
 	ltr(GD_TSS);
 }
 
+void pmm_manager_init()
+{
+#ifndef PMM_MANAGER
+#define PMM_MANAGER first_fit
+#endif
+	pmm_manager = &PMM_MANAGER;
+	printf("use pmm manager: %s\n", pmm_manager->name);
+	pmm_manager->init();
+}
+
 void page_init()
 {
-	struct e820map *memmap = (struct e820map *)(MEMMAP_ADDR + KERNBASE);
+	struct e820map *memmap = (struct e820map *)virtual_addr(MEMMAP_ADDR);
 
 	puts("e820map:");
 	uint64_t max_page = 0;
@@ -126,11 +141,15 @@ void page_init()
 	for (int i = 0; i < num_pages; ++i) {
 		set_page_reserved(pages + i);
 	}
+
+	uintptr_t free_mem = physical_addr((uintptr_t)pages +
+					   sizeof(struct Page) * num_pages);
 }
 
 /* pmm_init - initialize the physical memory management */
 void pmm_init()
 {
+	pmm_manager_init();
 	// detect physical memory space, reserve already used memory,
 	// then use pmm->init_memmap to create free page list
 	page_init();
