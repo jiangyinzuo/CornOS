@@ -3,11 +3,17 @@ include tools/functions.mk
 GCC_FLAGS := -I. -Iinclude -fno-builtin -fno-PIC -Wall -ggdb \
                  -m32 -gstabs -nostdinc -fno-stack-protector
 
-SRC = kernel arch lib main
-OBJ = bin/obj
+ifndef TEST
+SRC = main kernel arch lib
+KERNEL_SRC = $(shell find $(SRC) -type f -regex '.*\.[S|c]')  # list of source files
+KERNEL_OBJS = $(filter %.o,$(KERNEL_SRC:.S=.o) $(KERNEL_SRC:.c=.o))     # list of object files
+else
+SRC = kernel arch lib
+KERNEL_SRC = $(shell find $(SRC) -type f -regex '.*\.[S|c]') $(TEST)  # list of source files
+KERNEL_OBJS = $(filter %.o,$(KERNEL_SRC:.S=.o) $(KERNEL_SRC:.c=.o))     # list of object files
+endif
 
-KERNEL_SRC := $(shell find $(SRC) -type f -regex '.*\.[S|c]')  # list of kernel/*.c
-KERNEL_OBJS := $(filter %.o,$(KERNEL_SRC:.S=.o) $(KERNEL_SRC:.c=.o))     # list of object files
+OBJ = bin/obj
 
 all: GCC_FLAGS += -D NDEBUG
 all: corn.img
@@ -29,7 +35,7 @@ corn.img: boot_block kernel_objs
 #--------------- compile all kernel .o files -------------------
 
 kernel_objs: $(KERNEL_OBJS)     # target
-
+	@echo $(KERNEL_OBJS)
 %.o: %.S
 	@mkdir -p $(shell dirname $(OBJ)/$@)
 	@gcc $(GCC_FLAGS) -o $(OBJ)/$@ -c $<
@@ -63,4 +69,4 @@ mbr_sign: tools/mbr_sign.c
 
 clean:
 	rm -rf ./bin
-	make -C ./test clean
+	make -C ./test/lib clean
