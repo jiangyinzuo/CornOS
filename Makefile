@@ -20,6 +20,9 @@ all: corn.img
 
 debug: corn.img
 
+gdb: corn.img
+	qemu-system-i386 -S -s -hda ./bin/$<
+
 .PHONY: test
 
 test:
