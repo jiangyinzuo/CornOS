@@ -30,7 +30,7 @@ void page_init()
 	// defined in tools/kernel.ld
 	extern char kernel_end[];
 	pages = (struct Page *)ROUNDUP((void *)kernel_end, PGSIZE);
-	printf("max_physical_addr: %llx; num_pages: %llx\n", max_physical_addr,
+	printf("max_physical_addr: %llx; num_pages: %u\n", max_physical_addr,
 	       num_pages);
 
 	for (int i = 0; i < num_pages; ++i) {

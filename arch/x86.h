@@ -100,8 +100,6 @@ static inline void ltr(uint16_t sel)
 	asm volatile("ltr %0" ::"r"(sel));
 }
 
-static inline int __strcmp(const char *s1, const char *s2)
-	__attribute__((always_inline));
 static inline char *__strcpy(char *dst, const char *src)
 	__attribute__((always_inline));
 static inline void *__memset(void *s, char c, size_t n)
@@ -110,27 +108,6 @@ static inline void *__memmove(void *dst, const void *src, size_t n)
 	__attribute__((always_inline));
 static inline void *__memcpy(void *dst, const void *src, size_t n)
 	__attribute__((always_inline));
-
-#ifndef __HAVE_ARCH_STRCMP
-#define __HAVE_ARCH_STRCMP
-static inline int __strcmp(const char *s1, const char *s2)
-{
-	int d0, d1, ret;
-	asm volatile("1: lodsb;"
-		     "scasb;"
-		     "jne 2f;"
-		     "testb %%al, %%al;"
-		     "jne 1b;"
-		     "xorl %%eax, %%eax;"
-		     "jmp 3f;"
-		     "2: sbbl %%eax, %%eax;"
-		     "orb $1, %%al;"
-		     "3:"
-		     : "=a"(ret), "=&S"(d0), "=&D"(d1)
-		     : "1"(s1), "2"(s2)
-		     : "memory");
-	return ret;
-}
 
 #endif /* __HAVE_ARCH_STRCMP */
 
@@ -148,7 +125,6 @@ static inline char *__strcpy(char *dst, const char *src)
 		     : "memory");
 	return dst;
 }
-#endif /* __HAVE_ARCH_STRCPY */
 
 #ifndef __HAVE_ARCH_MEMSET
 #define __HAVE_ARCH_MEMSET

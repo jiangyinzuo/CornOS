@@ -11,4 +11,12 @@ atomic_set_bit(long nr, volatile void *addr)
 		     : "Ir"(nr));
 }
 
+static inline void __attribute__((always_inline))
+atomic_clear_bit(int nr, volatile void *addr)
+{
+	asm volatile("lock btrl %1, %0"
+		     : "=m"(*(volatile long *)addr)
+		     : "Ir"(nr));
+}
+
 #endif // CORN_OS_ATOMIC_H

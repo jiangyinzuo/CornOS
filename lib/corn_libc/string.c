@@ -1,6 +1,11 @@
 // Copyright (c) 2020, Jiang Yinzuo. All rights reserved.
 
 #include <corn_libc/string.h>
+#include <config.h>
+
+#if ARCH == x86
+#include <arch/x86/string.h>
+#endif
 
 /**
  * strlen - calculate the length of the string @s, not including
@@ -38,4 +43,16 @@ size_t strnlen(const char *s, size_t len)
 		cnt++;
 	}
 	return cnt;
+}
+
+int strcmp(const char *s1, const char *s2)
+{
+#ifdef ARCH
+	return __strcmp(s1, s2);
+#else
+	while (*s1 && *s1 == *s2) {
+		++s1, ++s2;
+	}
+	return *s1 - *s2;
+#endif
 }

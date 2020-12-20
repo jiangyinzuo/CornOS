@@ -28,14 +28,14 @@ struct PmManager {
 	void (*init)();
 
 	/** initialize memory with @n pages */
-	void (*init_memmap)(struct Page *base, size_t n);
+	void (*const init_memmap)(struct Page *base, size_t n);
 
 	/* allocate >=n pages, depend on the allocation algorithm */
-	struct Page *(*alloc_pages)(size_t n);
+	struct Page *(*const alloc_pages)(size_t n);
 
 	// free >=n pages with "base" addr of Page descriptor structures(layout.h)
-	void (*free_pages)(struct Page *base, size_t n);
-	size_t (*num_free_pages)();
+	void (*const free_pages)(struct Page *base, size_t n);
+	size_t (*const num_free_pages)();
 };
 
 extern struct PmManager *pm_manager;
