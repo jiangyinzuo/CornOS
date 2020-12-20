@@ -92,7 +92,6 @@ static inline int list_is_first(const struct list_head *list,
 	return list->prev == head;
 }
 
-
 /**
  * list_is_last - tests whether @list is the last entry in list @head
  * @list: the entry to test
@@ -105,12 +104,44 @@ static inline int list_is_last(const struct list_head *list,
 }
 
 /**
+ * list_empty - tests whether a list is empty
+ * @list:       the list to test.
+ */
+static inline _Bool list_empty(struct list_head *list)
+{
+	return list->next == list;
+}
+
+/**
+ * Delete a list entry by making the prev/next entries point to each other.
+ *
+ * This is only for internal list manipulation where we know
+ * the prev/next entries already!
+ */
+static inline void __list_del(struct list_head *prev, struct list_head *next)
+{
+	prev->next = next;
+	next->prev = prev;
+}
+
+/**
+ * list_del - deletes entry from list
+ * @listelm: the element to delete from the list
+ *
+ * Note: list_empty() on @elem does not return true after this, the entry is
+ * in an undefined state.
+ */
+static inline void list_del(struct list_head *elem)
+{
+	__list_del(elem->prev, elem->next);
+}
+
+/**
  * list_entry - get the struct for this entry
  * @ptr:	the &struct list_head pointer.
  * @type:	the type of the struct this is embedded in.
  * @member:	the name of the list_head within the struct.
  */
-#define list_entry(ptr, type, member) \
-	to_struct(ptr, type, member)
+#define list_entry(ptr, type, member) to_struct(ptr, type, member)
 
 #endif // CORN_OS_LIST_H

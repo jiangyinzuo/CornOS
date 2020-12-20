@@ -12,7 +12,7 @@ test_all_files() {
     if [ -d $1"/"$file ]; then
       test_all_files $1"/"$file
     else
-      make TEST=$1"/"$file
+      make debug TEST=$1"/"$file
       qemu-system-i386 -hda ./bin/corn.img
     fi
   done

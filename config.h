@@ -5,5 +5,6 @@
 
 // first_fit | buddy | slub
 #define PM_MANAGER first_fit
+#define ARCH x86
 
 #endif // CORNOS__CONFIG_H

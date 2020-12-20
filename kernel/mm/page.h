@@ -165,9 +165,15 @@ static inline void set_page_property(struct Page *page)
 {
 	atomic_set_bit(PG_property, &(page->flags));
 }
-#define clear_page_property(page) \
-	atomic_clear_bit(PG_property, &((page)->flags))
-#define test_page_property(page)  test_bit(PG_property, &((page)->flags)
+
+static inline void clear_page_property(struct Page *page)
+{
+	atomic_clear_bit(PG_property, &(page->flags));
+}
+static inline _Bool test_page_property(struct Page *page)
+{
+	return test_bit(PG_property, &(page->flags));
+}
 
 void page_init();
 
