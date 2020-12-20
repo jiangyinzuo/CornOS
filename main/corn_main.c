@@ -2,6 +2,7 @@
 
 #include <corn_libc/stdio.h>
 #include "kernel/init/kernel_init.h"
+#include "kernel/mm/pmm.h"
 
 _Noreturn void corn_main()
 {
@@ -12,7 +13,7 @@ _Noreturn void corn_main()
 
 	char m_Test1[20] = "waiting";
 	puts(m_Test1);
-	printf("hello %d\n", 123);
+	print_page_table();
 	for (;;) {
 	}
 }

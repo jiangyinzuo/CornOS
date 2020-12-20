@@ -44,7 +44,7 @@
  *                            |                                 |
  *                            +---------------------------------+ 0xFB000000
  *                            |   Cur. Page Table (Kern, RW)    | RW/-- PTSIZE
- *     VPT -----------------> +---------------------------------+ 0xFAC00000
+ *     PAGE_TABLE_VA -------> +---------------------------------+ 0xFAC00000
  *                            |        Invalid Memory (*)       | --/--
  *     KERNTOP -------------> +---------------------------------+ 0xF8000000
  *                            |                                 |
@@ -67,13 +67,14 @@
 #define KMEMSIZE 0x38000000 // the maximum amount of physical memory
 #define KERNTOP (KERNBASE + KMEMSIZE)
 
-/* *
- * Virtual page table. Entry page_dir_index[VPT] in the PD (Page Directory) contains
+/*
+ * Virtual addr of page table.
+ * Entry page_dir_index[PAGE_TABLE_VA] in the PD (Page Directory) contains
  * a pointer to the page directory itself, thereby turning the PD into a page
  * table, which maps all the PTEs (Page Table Entry) containing the page mappings
- * for the entire virtual address space into that 4 Meg region starting at VPT.
- * */
-#define VPT 0xFAC00000
+ * for the entire virtual address space into that 4 Meg region starting at PAGE_TABLE_VA.
+ */
+#define PAGE_TABLE_VA 0xFAC00000
 
 #define KSTACKPAGE 2 // # of pages in kernel stack
 #define KSTACKSIZE (KSTACKPAGE * PGSIZE) // sizeof kernel stack

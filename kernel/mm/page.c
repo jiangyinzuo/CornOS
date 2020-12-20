@@ -21,7 +21,7 @@
 pte_t *get_pte(pde_t *pgdir, uintptr_t la, _Bool create_page_table)
 {
 	pde_t *pdep = &pgdir[page_dir_index(la)];
-	if (!(*pdep & PTE_Present)) {
+	if (!(*pdep & PTE_P)) {
 		struct Page *page;
 		if (!create_page_table ||
 		    (page = pm_manager->alloc_pages(1)) == NULL) {
@@ -34,7 +34,7 @@ pte_t *get_pte(pde_t *pgdir, uintptr_t la, _Bool create_page_table)
 		memset((void *)kern_virtual_addr(pa), 0, PGSIZE);
 
 		// set page directory entry's permission
-		*pdep = pa | PTE_User | PTE_Writeable | PTE_Present;
+		*pdep = pa | PTE_US | PTE_RW | PTE_P;
 	}
 	return &((pte_t *)kern_virtual_addr(PDE_ADDR(*pdep)))[PTX(la)];
 }

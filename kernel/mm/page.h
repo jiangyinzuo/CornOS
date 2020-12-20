@@ -11,7 +11,7 @@
  * |      Index                |     Index      |                     |
  * +---------------------------+----------------+---------------------+
  *  \--- page_dir_index(la) --/ \--- PTX(la) --/ \---- PGOFF(la) ----/
- *  \----------- PPN(la) -----------/
+ *  \----------- PPN(la) ----------------------/
  *
  * The page_dir_index, PTX, PGOFF, and PPN macros decompose linear addresses as shown.
  * To construct a linear address la from page_dir_index(la), PTX(la), and PGOFF(la),
@@ -35,21 +35,21 @@
 #define PDE_ADDR(pde) PTE_ADDR(pde)
 
 /* page directory and page table constants */
-#define NPDEENTRY 1024 // page directory entries per page directory
-#define NPTEENTRY 1024 // page table entries per page table
+#define NUM_PDE 1024 // page directory entries per page directory
+#define NUM_PTE 1024 // page table entries per page table
 
 #define PGSIZE 4096 // bytes mapped by a page (4kb)
 #define PGSHIFT 12 // log2(PGSIZE)
-#define PTSIZE (PGSIZE * NPTEENTRY) // bytes mapped by a page directory entry
+#define PTSIZE (PGSIZE * NUM_PTE) // bytes mapped by a page directory entry
 #define PTSHIFT 22 // log2(PTSIZE)
 
 #define PTXSHIFT 12 // offset of PTX in a linear address
 #define PDXSHIFT 22 // offset of page_dir_index in a linear address
 
 /* page table/directory entry flags */
-#define PTE_Present 0x001 // Present
-#define PTE_Writeable 0x002 // Writeable
-#define PTE_User 0x004 // User can access
+#define PTE_P 0x001 // Present
+#define PTE_RW 0x002 // Writeable
+#define PTE_US 0x004 // User can access
 #define PTE_PWT 0x008 // Write-Through
 #define PTE_PCD 0x010 // Cache-Disable
 #define PTE_A 0x020 // Accessed
@@ -60,7 +60,7 @@
 // The PTE_AVAIL bits aren't used by the kernel or interpreted by the
 // hardware, so user processes are allowed to set them arbitrarily.
 
-#define PTE_USER (PTE_User | PTE_Writeable | PTE_Present)
+#define PTE_USER (PTE_US | PTE_RW | PTE_P)
 
 /* Flags describing the status of a page frame */
 #define PG_reserved 0 // the page descriptor is reserved for kernel or unusable
@@ -74,16 +74,13 @@
 #include <corn_os/atomic.h>
 #include "layout.h"
 
-typedef uintptr_t pte_t; // page table entry
-typedef uintptr_t pde_t; // page directory entry
+typedef uintptr_t pte_t; // page table entry (L2 page table)
+typedef uintptr_t pde_t; // page directory entry (L1 page table)
 
 pte_t *get_pte(pde_t *pgdir, uintptr_t la, _Bool create_page_table);
 
-// page directory index
-static inline size_t page_dir_index(uintptr_t linear_addr)
-{
-	return (linear_addr >> PDXSHIFT) & 0x3FF;
-}
+#define page_dir_index(linear_addr) \
+	((((uintptr_t)(linear_addr)) >> PDXSHIFT) & 0x3FF)
 
 struct Page {
 	int ref_cnt; // page frame's reference counter

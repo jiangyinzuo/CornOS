@@ -7,6 +7,7 @@
 #include "mmu.h"
 #include "layout.h"
 #include "page.h"
+#include <corn_libc/stdio.h>
 #include <corn_libc/stddef.h>
 #include <corn_libc/assert.h>
 #include <corn_os/algorithm.h>
@@ -39,6 +40,26 @@ struct Page *pages;
 size_t num_pages = 0;
 
 pde_t *boot_pgdir = &__boot_pgdir;
+
+// physical address of boot-time page directory
+uintptr_t boot_cr3;
+
+/* *
+ * The page directory entry corresponding to the virtual address range
+ * [VPT, VPT + PTSIZE) points to the page directory itself. Thus, the page
+ * directory is treated as a page table as well as a page directory.
+ *
+ * One result of treating the page directory as a page table is that all PTEs
+ * can be accessed though a "virtual page table" at virtual address VPT. And the
+ * PTE for number n is stored in PageTableVA[n].
+ *
+ * A second consequence is that the contents of the current page directory will
+ * always available at virtual address PGADDR(PDX(VPT), PDX(VPT), 0), to which
+ * PageDirVA is set bellow.
+ * */
+pte_t *const PageTableVA = (pte_t *)PAGE_TABLE_VA;
+pde_t *const PageDirVA = (pde_t *)PGADDR(page_dir_index(PAGE_TABLE_VA),
+					 page_dir_index(PAGE_TABLE_VA), 0);
 
 /*
  * Global Descriptor Table:
@@ -91,7 +112,7 @@ void load_esp0(uintptr_t esp0)
 }
 
 /* gdt_init - initialize the default GDT and TSS */
-static void gdt_init(void)
+static void gdt_init()
 {
 	// set boot kernel stack and default SS0
 	load_esp0((uintptr_t)bootstacktop);
@@ -108,43 +129,124 @@ static void gdt_init(void)
 	ltr(GD_TSS);
 }
 
-//boot_map_segment - setup&enable the paging mechanism
-// parameters
-//  la:   linear address of this memory need to map (after x86 segment map)
-//  size: memory size
-//  pa:   physical address of this memory
-//  perm: permission of this memory
-static void boot_map_segment(pde_t *pgdir, uintptr_t la, size_t size,
-			     uintptr_t pa, uint32_t perm)
+/**
+ * boot_map_segment - setup&enable the paging mechanism
+ * map all physical memory to linear memory with base linear addr KERNBASE
+ * linear_addr KERNBASE ~ KERNBASE + KMEMSIZE = phy_addr 0 ~ KMEMSIZE
+ */
+static void boot_map_segment()
 {
-	assert(PGOFF(la) == PGOFF(pa));
-	size_t n = ROUNDUP(size + PGOFF(la), PGSIZE) / PGSIZE;
+	// recursively insert boot_pgdir in itself
+	// to form a virtual page table at virtual address PAGE_TABLE_VA
+	boot_pgdir[page_dir_index(PAGE_TABLE_VA)] =
+		kern_physical_addr((uintptr_t)boot_pgdir) | PTE_P | PTE_RW;
+
+	uintptr_t la = KERNBASE, pa = 0;
+	_Static_assert(
+		PGOFF(KERNBASE) == PGOFF(0),
+		"page offset linear addr should be equal to page offset physical addr");
+
+	size_t _num_pages = ROUNDUP(KMEMSIZE + PGOFF(la), PGSIZE) / PGSIZE;
+
 	la = ROUNDDOWN(la, PGSIZE);
 	pa = ROUNDDOWN(pa, PGSIZE);
-	for (; n > 0; n--, la += PGSIZE, pa += PGSIZE) {
-		pte_t *ptep = get_pte(pgdir, la, 1);
+	for (; _num_pages-- > 0; la += PGSIZE, pa += PGSIZE) {
+		pte_t *ptep = get_pte(boot_pgdir, la, 1);
 		assert(ptep != NULL);
-		*ptep = pa | PTE_Present | perm;
+		*ptep = pa | PTE_P | PTE_RW;
 	}
 }
 
-/* pmm_init - initialize the physical memory management */
+/**
+ * pmm_init - initialize the physical memory management
+ *
+ * Before calling pmm_init, only 0~4MB virtual address are mapped to
+ * physical address(va = pa + KERNBASE).
+ *
+ * pmm_init will map 0~KMEMSIZE virtual address and set gdt
+ */
 void pmm_init()
 {
+	// We've already enabled paging
+	boot_cr3 = kern_physical_addr((uintptr_t)boot_pgdir);
+
 	pm_manager_init();
+
 	// detect physical memory space, reserve already used memory,
 	// then use pmm->init_memmap to create free page list
 	page_init();
 
-	// recursively insert boot_pgdir in itself
-	// to form a virtual page table at virtual address VPT
-	boot_pgdir[page_dir_index(VPT)] =
-		kern_physical_addr((uintptr_t)boot_pgdir) | PTE_Present |
-		PTE_Writeable;
+	boot_map_segment();
 
-	// map all physical memory to linear memory with base linear addr KERNBASE
-	// linear_addr KERNBASE ~ KERNBASE + KMEMSIZE = phy_addr 0 ~ KMEMSIZE
-	boot_map_segment(boot_pgdir, KERNBASE, KMEMSIZE, 0, PTE_Writeable);
-
+	// Since we are using bootloader's GDT,
+	// we should reload gdt (second time, the last time) to get user segments and the TSS
+	// map virtual_addr 0 ~ 4G = linear_addr 0 ~ 4G
+	// then set kernel stack (ss:esp) in TSS, setup TSS in gdt, load TSS
 	gdt_init();
+}
+
+/**
+ * get_pgtable_items - In [left, right] range of PDT or PT, find a continuous linear addr space
+ *                  - (left_store*X_SIZE~right_store*X_SIZE) for PDT or PT
+ *                  - X_SIZE=PTSIZE=4M, if PDT; X_SIZE=PGSIZE=4K, if PT
+ *  @left:        no use ???
+ *  @right:       the high side of table's range
+ *  @start:       the low side of table's range
+ *  @table:       the beginning addr of table
+ *  @left_store:  the pointer of the high side of table's next range
+ *  @right_store: the pointer of the low side of table's next range
+ * return value: 0 - not a invalid item range, perm - a valid item range with perm permission
+ */
+static int get_pgtable_items(size_t left, size_t right, size_t start,
+			     uintptr_t *table, size_t *left_store,
+			     size_t *right_store)
+{
+	if (start >= right) {
+		return 0;
+	}
+	while (start < right && !(table[start] & PTE_P)) {
+		start++;
+	}
+	if (start < right) {
+		if (left_store != NULL) {
+			*left_store = start;
+		}
+		int perm = (table[start++] & PTE_USER);
+		while (start < right && (table[start] & PTE_USER) == perm) {
+			start++;
+		}
+		if (right_store != NULL) {
+			*right_store = start;
+		}
+		return perm;
+	}
+	return 0;
+}
+
+//perm2str - use string 'u,r,w,-' to present the permission
+static const char *perm2str(int perm)
+{
+	static char str[4] = "-r-";
+	str[0] = (perm & PTE_US) ? 'u' : '-';
+	str[2] = (perm & PTE_RW) ? 'w' : '-';
+	return str;
+}
+
+void print_page_table()
+{
+	puts("-------------------- BEGIN --------------------");
+	size_t left, right = 0, perm;
+	while ((perm = get_pgtable_items(0, NUM_PDE, right, PageDirVA, &left,
+					 &right)) != 0) {
+		printf("PDE(%u) la: %08x-%08x %s\n", right - left,
+		       left * PTSIZE, right * PTSIZE, perm2str(perm));
+		size_t l, r = left * NUM_PTE;
+		while ((perm = get_pgtable_items(left * NUM_PTE,
+						 right * NUM_PTE, r,
+						 PageTableVA, &l, &r)) != 0) {
+			printf("  |-- PTE(%u) la: %08x-%08x %s\n", r - l,
+			       l * PGSIZE, r * PGSIZE, perm2str(perm));
+		}
+	}
+	puts("--------------------- END ---------------------");
 }

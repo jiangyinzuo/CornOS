@@ -4,6 +4,14 @@
 
 #define REALLOC(x) (x - KERNBASE)
 
+
+/*
+ * before executing kern_entry,
+ * virt addr = linear addr = phy addr
+ *
+ * before calling corn_main,
+ * virt addr = linear addr = phy addr + 0xC0000000 (linear addr in 0xC0000000~0xC0000000+4MB)
+ */
 .text
 .globl kern_entry
 kern_entry:
@@ -56,15 +64,15 @@ bootstacktop:
 __boot_pgdir:
 .globl __boot_pgdir
     # map va 0 ~ 4M to pa 0 ~ 4M (temporary)
-    .long REALLOC(__boot_pt1) + (PTE_Present | PTE_User | PTE_Writeable)
+    .long REALLOC(__boot_pt1) + (PTE_P | PTE_US | PTE_RW)
     .space (KERNBASE >> PGSHIFT >> 10 << 2) - (. - __boot_pgdir) # pad to PDE of KERNBASE
     # map va KERNBASE + (0 ~ 4M) to pa 0 ~ 4M
-    .long REALLOC(__boot_pt1) + (PTE_Present | PTE_User | PTE_Writeable)
+    .long REALLOC(__boot_pt1) + (PTE_P | PTE_US | PTE_RW)
     .space PGSIZE - (. - __boot_pgdir) # pad to PGSIZE
 
 .set i, 0
 __boot_pt1:
 .rept 1024
-    .long i * PGSIZE + (PTE_Present | PTE_Writeable)
+    .long i * PGSIZE + (PTE_P | PTE_RW)
     .set i, i + 1
 .endr

@@ -14,7 +14,8 @@
 
 extern char bootstack[], bootstacktop[];
 
-void pmm_init(void);
+void pmm_init();
+void print_page_table();
 
 #endif
 
