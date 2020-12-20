@@ -102,8 +102,6 @@ static inline void ltr(uint16_t sel)
 
 static inline char *__strcpy(char *dst, const char *src)
 	__attribute__((always_inline));
-static inline void *__memset(void *s, char c, size_t n)
-	__attribute__((always_inline));
 static inline void *__memmove(void *dst, const void *src, size_t n)
 	__attribute__((always_inline));
 static inline void *__memcpy(void *dst, const void *src, size_t n)
@@ -125,19 +123,6 @@ static inline char *__strcpy(char *dst, const char *src)
 		     : "memory");
 	return dst;
 }
-
-#ifndef __HAVE_ARCH_MEMSET
-#define __HAVE_ARCH_MEMSET
-static inline void *__memset(void *s, char c, size_t n)
-{
-	int d0, d1;
-	asm volatile("rep; stosb;"
-		     : "=&c"(d0), "=&D"(d1)
-		     : "0"(n), "a"(c), "1"(s)
-		     : "memory");
-	return s;
-}
-#endif /* __HAVE_ARCH_MEMSET */
 
 #ifndef __HAVE_ARCH_MEMMOVE
 #define __HAVE_ARCH_MEMMOVE

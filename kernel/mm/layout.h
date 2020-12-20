@@ -68,7 +68,7 @@
 #define KERNTOP (KERNBASE + KMEMSIZE)
 
 /* *
- * Virtual page table. Entry PDX[VPT] in the PD (Page Directory) contains
+ * Virtual page table. Entry page_dir_index[VPT] in the PD (Page Directory) contains
  * a pointer to the page directory itself, thereby turning the PD into a page
  * table, which maps all the PTEs (Page Table Entry) containing the page mappings
  * for the entire virtual address space into that 4 Meg region starting at VPT.

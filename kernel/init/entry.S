@@ -56,15 +56,15 @@ bootstacktop:
 __boot_pgdir:
 .globl __boot_pgdir
     # map va 0 ~ 4M to pa 0 ~ 4M (temporary)
-    .long REALLOC(__boot_pt1) + (PTE_P | PTE_U | PTE_W)
+    .long REALLOC(__boot_pt1) + (PTE_Present | PTE_User | PTE_Writeable)
     .space (KERNBASE >> PGSHIFT >> 10 << 2) - (. - __boot_pgdir) # pad to PDE of KERNBASE
     # map va KERNBASE + (0 ~ 4M) to pa 0 ~ 4M
-    .long REALLOC(__boot_pt1) + (PTE_P | PTE_U | PTE_W)
+    .long REALLOC(__boot_pt1) + (PTE_Present | PTE_User | PTE_Writeable)
     .space PGSIZE - (. - __boot_pgdir) # pad to PGSIZE
 
 .set i, 0
 __boot_pt1:
 .rept 1024
-    .long i * PGSIZE + (PTE_P | PTE_W)
+    .long i * PGSIZE + (PTE_Present | PTE_Writeable)
     .set i, i + 1
 .endr

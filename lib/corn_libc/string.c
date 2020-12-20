@@ -56,3 +56,16 @@ int strcmp(const char *s1, const char *s2)
 	return *s1 - *s2;
 #endif
 }
+
+void *memset(void *s, char c, size_t n)
+{
+#ifdef ARCH
+	return __memset(s, c, n);
+#else
+	char *p = s;
+	while (n-- > 0) {
+		*p++ = c;
+	}
+	return s;
+#endif
+}

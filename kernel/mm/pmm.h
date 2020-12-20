@@ -12,6 +12,8 @@
 #include <corn_os/list.h>
 #include <corn_os/atomic.h>
 
+extern char bootstack[], bootstacktop[];
+
 void pmm_init(void);
 
 #endif

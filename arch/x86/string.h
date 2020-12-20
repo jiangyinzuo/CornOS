@@ -23,4 +23,15 @@ __strcmp(const char *s1, const char *s2)
 	return ret;
 }
 
+static inline void *__attribute__((always_inline))
+__memset(void *s, char c, size_t n)
+{
+	int d0, d1;
+	asm volatile("rep; stosb;"
+		     : "=&c"(d0), "=&D"(d1)
+		     : "0"(n), "a"(c), "1"(s)
+		     : "memory");
+	return s;
+}
+
 #endif // CORNOS_ARCH_X86_STRING_H

@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="debug" type="CLion_Remote" version="1" remoteCommand="localhost:1234" symbolFile="$PROJECT_DIR$/bin/corn_kernel" sysroot="$PROJECT_DIR$">
-    <debugger kind="GDB" isBundled="true" />
+    <debugger toolchainName="Default" />
     <method v="2" />
   </configuration>
 </component>

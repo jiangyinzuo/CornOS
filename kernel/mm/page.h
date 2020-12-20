@@ -6,20 +6,17 @@
 /*
  * A linear address 'la' has a three-part structure as follows:
  *
- * +--------10------+-------10-------+---------12----------+
- * | Page Directory |   Page Table   | Offset within Page  |
- * |      Index     |     Index      |                     |
- * +----------------+----------------+---------------------+
- *  \--- PDX(la) --/ \--- PTX(la) --/ \---- PGOFF(la) ----/
+ * +--------10-----------------+-------10-------+---------12----------+
+ * | Page Directory            |   Page Table   | Offset within Page  |
+ * |      Index                |     Index      |                     |
+ * +---------------------------+----------------+---------------------+
+ *  \--- page_dir_index(la) --/ \--- PTX(la) --/ \---- PGOFF(la) ----/
  *  \----------- PPN(la) -----------/
  *
- * The PDX, PTX, PGOFF, and PPN macros decompose linear addresses as shown.
- * To construct a linear address la from PDX(la), PTX(la), and PGOFF(la),
- * use PGADDR(PDX(la), PTX(la), PGOFF(la)).
+ * The page_dir_index, PTX, PGOFF, and PPN macros decompose linear addresses as shown.
+ * To construct a linear address la from page_dir_index(la), PTX(la), and PGOFF(la),
+ * use PGADDR(page_dir_index(la), PTX(la), PGOFF(la)).
  */
-
-// page directory index
-#define PDX(la) ((((uintptr_t)(la)) >> PDXSHIFT) & 0x3FF)
 
 // page table index
 #define PTX(la) ((((uintptr_t)(la)) >> PTXSHIFT) & 0x3FF)
@@ -47,12 +44,12 @@
 #define PTSHIFT 22 // log2(PTSIZE)
 
 #define PTXSHIFT 12 // offset of PTX in a linear address
-#define PDXSHIFT 22 // offset of PDX in a linear address
+#define PDXSHIFT 22 // offset of page_dir_index in a linear address
 
 /* page table/directory entry flags */
-#define PTE_P 0x001 // Present
-#define PTE_W 0x002 // Writeable
-#define PTE_U 0x004 // User
+#define PTE_Present 0x001 // Present
+#define PTE_Writeable 0x002 // Writeable
+#define PTE_User 0x004 // User can access
 #define PTE_PWT 0x008 // Write-Through
 #define PTE_PCD 0x010 // Cache-Disable
 #define PTE_A 0x020 // Accessed
@@ -63,7 +60,7 @@
 // The PTE_AVAIL bits aren't used by the kernel or interpreted by the
 // hardware, so user processes are allowed to set them arbitrarily.
 
-#define PTE_USER (PTE_U | PTE_W | PTE_P)
+#define PTE_USER (PTE_User | PTE_Writeable | PTE_Present)
 
 /* Flags describing the status of a page frame */
 #define PG_reserved 0 // the page descriptor is reserved for kernel or unusable
@@ -80,6 +77,14 @@
 typedef uintptr_t pte_t; // page table entry
 typedef uintptr_t pde_t; // page directory entry
 
+pte_t *get_pte(pde_t *pgdir, uintptr_t la, _Bool create_page_table);
+
+// page directory index
+static inline size_t page_dir_index(uintptr_t linear_addr)
+{
+	return (linear_addr >> PDXSHIFT) & 0x3FF;
+}
+
 struct Page {
 	int ref_cnt; // page frame's reference counter
 	uint32_t flags; // array of flags that describe the status of the page frame
@@ -88,6 +93,9 @@ struct Page {
 	unsigned int property;
 	struct list_head page_link; // free list link
 };
+
+// virtual address of boot-time page directory
+extern pde_t __boot_pgdir;
 
 extern struct Page *pages;
 extern size_t num_pages;

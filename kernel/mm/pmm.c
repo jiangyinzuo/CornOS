@@ -7,6 +7,9 @@
 #include "mmu.h"
 #include "layout.h"
 #include "page.h"
+#include <corn_libc/stddef.h>
+#include <corn_libc/assert.h>
+#include <corn_os/algorithm.h>
 
 /*
  * Task State Segment:
@@ -34,6 +37,8 @@ static struct taskstate ts = { 0 };
 struct Page *pages;
 // amount of physical memory (in pages)
 size_t num_pages = 0;
+
+pde_t *boot_pgdir = &__boot_pgdir;
 
 /*
  * Global Descriptor Table:
@@ -75,27 +80,52 @@ static inline void lgdt(struct XDTR_t *pd)
 	asm volatile("ljmp %0, $1f\n 1:\n" ::"i"(KERNEL_CS));
 }
 
-/* temporary kernel stack */
-uint8_t stack0[1024];
+/**
+ * load_esp0 - change the ESP0 in default task state segment,
+ * so that we can use different kernel stack when we trap frame
+ * user to kernel.
+ */
+void load_esp0(uintptr_t esp0)
+{
+	ts.ts_esp0 = esp0;
+}
 
 /* gdt_init - initialize the default GDT and TSS */
 static void gdt_init(void)
 {
-	// Setup a TSS so that we can get the right stack when we trap from
-	// user to the kernel. But not safe here, it's only a temporary value,
-	// it will be set to KSTACKTOP in lab2.
-	ts.ts_esp0 = (uint32_t)&stack0 + sizeof(stack0);
+	// set boot kernel stack and default SS0
+	load_esp0((uintptr_t)bootstacktop);
 	ts.ts_ss0 = KERNEL_DS;
 
 	// initialize the TSS filed of the gdt
-	gdt[SEG_TSS] = SEG16(STS_T32A, (uint32_t)&ts, sizeof(ts), DPL_KERNEL);
-	gdt[SEG_TSS].sd_s = 0;
+	// SEG_TSS has changed from SEG16 since v0.2.3
+	gdt[SEG_TSS] = SEGTSS(STS_T32A, (uintptr_t)&ts, sizeof(ts), DPL_KERNEL);
 
 	// reload all segment registers
 	lgdt(&gdt_pd);
 
 	// load the TSS
 	ltr(GD_TSS);
+}
+
+//boot_map_segment - setup&enable the paging mechanism
+// parameters
+//  la:   linear address of this memory need to map (after x86 segment map)
+//  size: memory size
+//  pa:   physical address of this memory
+//  perm: permission of this memory
+static void boot_map_segment(pde_t *pgdir, uintptr_t la, size_t size,
+			     uintptr_t pa, uint32_t perm)
+{
+	assert(PGOFF(la) == PGOFF(pa));
+	size_t n = ROUNDUP(size + PGOFF(la), PGSIZE) / PGSIZE;
+	la = ROUNDDOWN(la, PGSIZE);
+	pa = ROUNDDOWN(pa, PGSIZE);
+	for (; n > 0; n--, la += PGSIZE, pa += PGSIZE) {
+		pte_t *ptep = get_pte(pgdir, la, 1);
+		assert(ptep != NULL);
+		*ptep = pa | PTE_Present | perm;
+	}
 }
 
 /* pmm_init - initialize the physical memory management */
@@ -105,6 +135,16 @@ void pmm_init()
 	// detect physical memory space, reserve already used memory,
 	// then use pmm->init_memmap to create free page list
 	page_init();
+
+	// recursively insert boot_pgdir in itself
+	// to form a virtual page table at virtual address VPT
+	boot_pgdir[page_dir_index(VPT)] =
+		kern_physical_addr((uintptr_t)boot_pgdir) | PTE_Present |
+		PTE_Writeable;
+
+	// map all physical memory to linear memory with base linear addr KERNBASE
+	// linear_addr KERNBASE ~ KERNBASE + KMEMSIZE = phy_addr 0 ~ KMEMSIZE
+	boot_map_segment(boot_pgdir, KERNBASE, KMEMSIZE, 0, PTE_Writeable);
 
 	gdt_init();
 }

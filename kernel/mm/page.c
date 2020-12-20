@@ -4,7 +4,40 @@
 #include "pmm.h"
 #include <corn_os/algorithm.h>
 #include <corn_libc/stdio.h>
+#include <corn_libc/stddef.h>
+#include <corn_libc/string.h>
 #include "pm_manager/pm_manager.h"
+
+/**
+ * get_pte - get page table entry and return the kernel virtual address of this pte for la
+ *         - if the PT contains this pte didn't exist, alloc a page for PT
+ *
+ * @pgdir:  the kernel virtual base address of PDT
+ * @la:     the linear address need to map
+ * @create: whether alloc a page for PT
+ *
+ * @return: the kernel virtual address of this pte
+ */
+pte_t *get_pte(pde_t *pgdir, uintptr_t la, _Bool create_page_table)
+{
+	pde_t *pdep = &pgdir[page_dir_index(la)];
+	if (!(*pdep & PTE_Present)) {
+		struct Page *page;
+		if (!create_page_table ||
+		    (page = pm_manager->alloc_pages(1)) == NULL) {
+			return NULL;
+		}
+		set_page_ref(page, 1);
+		uintptr_t pa = page2pa(page);
+
+		// clear page content
+		memset((void *)kern_virtual_addr(pa), 0, PGSIZE);
+
+		// set page directory entry's permission
+		*pdep = pa | PTE_User | PTE_Writeable | PTE_Present;
+	}
+	return &((pte_t *)kern_virtual_addr(PDE_ADDR(*pdep)))[PTX(la)];
+}
 
 void page_init()
 {

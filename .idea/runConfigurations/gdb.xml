@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="gdb" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile">
+    <makefile filename="$PROJECT_DIR$/Makefile" target="gdb" workingDirectory="" arguments="TEST=test/qemu/mm/first_fit_test.c">
+      <envs />
+    </makefile>
+    <method v="2" />
+  </configuration>
+</component>
