@@ -28,7 +28,7 @@ static void init_memmap(struct Page *base, size_t n)
 	base->property = n;
 	set_page_property(base);
 	free_area.num_free += n;
-	list_add(&base->page_link, &free_area.free_list);
+	list_add_tail(&base->page_link, &free_area.free_list);
 	assert(free_area.num_free <= num_pages);
 }
 
@@ -100,7 +100,7 @@ static void free_pages(struct Page *base, size_t n)
 		}
 		lh = lh->next;
 	}
-	list_add(&(base->page_link), lh);
+	list_add_tail(&(base->page_link), lh);
 }
 
 static size_t num_free_pages()
