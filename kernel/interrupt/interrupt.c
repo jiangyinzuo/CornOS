@@ -24,9 +24,12 @@ void intr_disable(void)
 void trap(struct trap_frame *tf)
 {
 	switch (tf->tf_trapno) {
+	case IRQ_BASE_ADDR + IRQ1_KEYBOARD:
+		puts("keyboard!!!");
+		break;
 	case IRQ_BASE_ADDR + IRQ0_TIMER:
 		++ticks;
-		if(ticks % NUM_TICKS == 0) {
+		if (ticks % NUM_TICKS == 0) {
 			printf("count: %d\n", ticks);
 		}
 		break;

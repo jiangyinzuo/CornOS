@@ -14,6 +14,9 @@ _Noreturn void corn_main()
 	char m_Test1[20] = "waiting";
 	puts(m_Test1);
 	print_page_table();
+	puts("input a character:");
+	char ch = getchar();
+	printf("your input: %c\n", ch);
 	for (;;) {
 	}
 }

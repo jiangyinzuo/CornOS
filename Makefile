@@ -1,7 +1,8 @@
 include tools/functions.mk
 
-GCC_FLAGS := -I. -Iinclude -fno-builtin -fno-PIC -Wall -ggdb \
-                 -m32 -gstabs -nostdinc -fno-stack-protector
+GCC_FLAGS := -I. -fno-omit-frame-pointer \
+			 -Iinclude -fno-builtin -O1 -static -Wall -ggdb \
+             -m32 -gstabs -nostdinc -fno-stack-protector
 
 ifndef TEST
 SRC = main kernel arch lib
