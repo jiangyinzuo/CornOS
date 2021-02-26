@@ -16,7 +16,11 @@ void kernel_init()
 	pmm_init();
 	pic_init();
 	idt_init();
-	kbd_init();
+
 	timer8253_init();
+
+	// TODO: get keyboard input
+	//	kbd_init();
+
 	intr_enable();
 }

@@ -126,12 +126,14 @@ static int kbd_proc_data(void)
 		// E0 escape character
 		shift |= E0ESC;
 		return 0;
-	} else if (data & 0x80) {
+	}
+	if (data & 0x80) {
 		// Key released
 		data = (shift & E0ESC ? data : data & 0x7F);
 		shift &= ~(shiftcode[data] | E0ESC);
 		return 0;
-	} else if (shift & E0ESC) {
+	}
+	if (shift & E0ESC) {
 		// Last character was an E0 escape; or with 0x80
 		data |= 0x80;
 		shift &= ~E0ESC;

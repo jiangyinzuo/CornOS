@@ -12,9 +12,11 @@
 #define NUM_IDT 256
 static struct gate_desc_t idt[NUM_IDT] = { { 0 } };
 
-static struct XDTR_t idtr = {
-	sizeof (idt) - 1, (uintptr_t)idt
-};
+static struct XDTR_t idtr = { sizeof(idt) - 1, (uintptr_t)idt };
+
+/**
+ * initialize Interrupt Descriptor Table
+ */
 void idt_init()
 {
 	extern uintptr_t __int_vectors[];

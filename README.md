@@ -6,6 +6,34 @@
 
 A toy OS written in C
 
+## Run In QEMU
+
+Run in QEMU
+
+```shell
+$ make clean
+$ make
+$ ./start.sh
+```
+
+Run QEMU test
+
+```shell
+$ ./start.sh
+```
+
+Run unit test
+
+```shell
+$ make test
+```
+
+Debug in GDB
+
+```shell
+$ ./dbg.sh
+```
+
 ## Release Note
 
 ### 0.2.x
